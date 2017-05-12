@@ -1,11 +1,11 @@
 #
-
-import sympy.abc
-from sympy.logic.boolalg import Not, And, Or
+#import sympy.abc
+#from sympy.logic.boolalg import Not, And, Or
 from sympy import Symbol
 from sympy.logic.inference import satisfiable
-from sympy.logic.boolalg import to_cnf
-import mpmath
+#from sympy.logic.boolalg import to_cnf
+from mpmath import*
+#import mpmath
 from itertools import product
 #import pprint 
 
@@ -19,6 +19,9 @@ class Rule(object):
 	
 		self.bodyExtension = []
 		self.headExtension = []
+		self.setHeadExension = []
+		self.setBodyExension = []
+
 		self.headWorlds = []
 		#self.vw = set()
 		#self.fw = set()
@@ -29,23 +32,222 @@ class World(object):
 	def __init__ (self, _name, _state):
 		self.name = _name
 		self.state = _state
+		self.value = set()
 		self.F = set()
 		self.dom = set()
 
-	def print_worlds(self):
-		for model in self.vw:
-			print("%s is verified by: \n" % (self.item))
-		for model in self.vw:	
+
+
+
+def obtain_atomic_formulas(file):
+	propositions = set()
+	for line in file:
+		if line.startswith("("):
+			prop_char = set()
+			for char in line:
+				#print(str(char))
+				if(str(char).isalpha()):
+					prop_char.add(str(char))
+			for item in prop_char:
+				new = Symbol(item)
+				propositions.add(new)
+	return propositions
+
+def construct_rules_dict(file):
+	lines = []
+	for line in file:
+		if line.startswith("("):
+			lines.append(line.rstrip("\n"))
+	#lines = [line.rstrip("\n") for line in file]
+	temp1 = [line[1:] for line in lines]
+	temp2 = [line[:-1] for line in temp1]
+	temp3 = [line.split(",") for line in temp2]
+	rules = {}
+	count = 0
+	for line in temp3:
+		item = line[0] + "," + line[1]
+		name = "r" + str(count)
+		new = Rule(name, item, line[0], line[1])
+		rules.update({name: new})
+		#rules[name] = new
+		count += 1
+	return rules	
+
+def construct_worlds(propositions):
+	num_worlds = list(range(2**len(propositions)))
+	world_names = ["w" + str(i) for i in num_worlds]
+	n = len(propositions)
+	table = list(product([False, True], repeat=n))
+	worlds = set()
+	count = 0
+	for row in table:
+		state = dict(zip(propositions, row))
+		new = World(world_names[count], state)
+		worlds.add(new)
+		count +=1
+	return worlds
+
+def world_values(world):
+	for world in worlds:
+		value = set()
+		for k, v in world.state.items():
+			#print("Is this working? \n")
+			#print("World K %s v %s \n" % (k, v))
+			if(v == True):
+				value.add(str(k))
+			else:
+				value.add("~" + str(k))
+
+		world.value = value
+
+
+#Key: A, model {A: True, D: False, C: False}
+def assingn_rule_extensions(rules):
+	for k, rule in rules.items():
+		
+		h_temp = satisfiable(rule.head, all_models = True)
+		for model in h_temp:
+			new = {}	
 			for key in model:
-				print("Here we go: %s: %s \n" % (key, model[key]))
-		for key in self.vw:
-			print("key: %s, value: %s \n" % (key, self.vw[key]))
-		print(" \n %s is violated by: \n" % (self.item))
-		for model in self.fw:
-			print(model)
-		print("\n %s is netural with respect to: \n" % (self.item))
-		for model in self.nw:
-			print(model)
+				new[key] = model[key]
+			rule.headExtension.append(new)
+		
+
+		b_temp = satisfiable(rule.body, all_models = True)
+		for model in b_temp:
+			new = {}	
+			for key in model:
+				new[key] = model[key]
+			rule.bodyExtension.append(new)
+
+def assign_sets_rules(rules):
+	for k, rule in rules.items():
+		h_small_worlds = []
+		for item in rule.headExtension:
+			_new = set()
+			for key, value in item.items():
+				#print("Key: %s, Value %s" % (key, value))
+				if(value == True):
+					#print("YES???")
+
+					_new.add(str(key))
+				else:
+					#print("NOT???")
+					_new.add("~" + str(key))
+
+			#new = frozenset(_new)
+			#print("Head Frozen: %s \n" % (_new))
+			h_small_worlds.append(_new)
+
+		for world in worlds:
+			for small in h_small_worlds:
+				#print("________small: %s world: %s" % (small, world.value))
+				#if(small <= world.value):
+				if(small.issubset(world.value) and world.name not in rule.setHeadExension):
+					#print("Adding?")
+					rule.setHeadExension.append(world.name)
+					#print("Adding world %s to extension of %s" % (world.name, rule.name))
+		
+
+		b_small_worlds = []
+
+		for item in rule.bodyExtension:
+			_new = set()
+			for key, value in item.items():
+				#print("Is this working? \n")
+				#print("Key: %s, Value %s" % (key, value))
+				if(value == True):
+					##print("YES???")
+					_new.add(str(key))
+				else:
+					#print("NOT???")
+					_new.add("~" + str(key))
+
+			#new = frozenset(_new)
+			#print("Body Frozen: %s \n" % (_new))
+			b_small_worlds.append(_new)
+
+		for world in worlds:
+			for small in b_small_worlds:
+				#print("________small: %s world: %s" % (small, world.value))
+				if(small <= world.value and world.name not in rule.setBodyExension):
+					#print("Adding?")
+					rule.setBodyExension.append(world.name)
+					#print("Adding world %s to extension of %s" % (world.name, rule.name))
+
+			
+
+			#rule.setBodyExension.add(new)
+		
+
+			
+			'''for model in h_temp:
+				for world in worlds:
+					if model < world.state:
+						rule.headExtension.append(world.state)'''
+
+
+		'''for char in str(rule.head):
+			if(char.isalpha()):
+				add = Symbol(char)
+				th1.add(add)
+		th2 = propositions.difference(th1)
+
+		item = ""
+		for p in th2:
+			item +=  "&" + "(" + str(p) + "|" +  "~" +  str(p) + ")"
+		head_check = rule.head + item
+		print("Head_check is: %s" % (head_check))
+				
+		h_temp = satisfiable(head_check, all_models = True)
+		#for m in h_temp:
+			#print("Here we go again: %s" % (m))
+		for model in h_temp:
+			new = {}	
+			for key in model:
+				new[key] = model[key]
+			rule.headExtension.append(new)
+		tb1 = set()
+		for char in str(rule.body):
+			if(char.isalpha()):
+				add = Symbol(char)
+				tb1.add(add)
+		tb2 = propositions.difference(tb1)
+		item = ""
+		for p in tb2:
+			item +=  "&" + "(" +str(p) + "|" +  "~" +  str(p) + ")"
+		body_check = rule.body + item
+		print("Body check is: %s" % (body_check))
+		b_temp = satisfiable(body_check, all_models = True)
+		for model in b_temp:
+			new = {}	
+			for key in model:
+				#print("Rule %s body issat by: %s: %s " % (rule.name, key, model[key]))
+				new[key] = model[key]
+			rule.bodyExtension.append(new)'''
+
+def domination_relations(worlds, rules):
+	for world in worlds:
+		for k1, r1 in rules.items():
+			for k2, r2 in rules.items():
+				if(world.name not in r1.setBodyExension or world.name in r2.setBodyExension):
+					if(world.name not in r1.setHeadExension or world.name not in r2.setHeadExension):
+						if((world.name in r2.setBodyExension and world.name not in r1.setBodyExension) or \
+						 (world.name in r1.setHeadExension or world.name in r2.setHeadExension)):
+							new = (r1.name, r2.name)
+							#print("add new dom")
+							world.dom.add(new)
+
+
+def assing_rule_violations(worlds, rules):
+	for world in worlds:
+		for k, rule in rules.items():
+			if(world.name in rule.setBodyExension and world.name not in rule.setHeadExension):
+				for d in world.dom:
+					if(d[1] == rule.name):
+						temp = rules[d[0]]
+						if(world.state not in temp.bodyExtension):
+							world.F.add(k)
 
 def compareDict(a, b):
 	Ka = set(a.keys())
@@ -53,6 +255,18 @@ def compareDict(a, b):
 	Ba = set(a.values())
 	Bb = set(b.values())
 	V = (Ka == Kb) & (Ba == Bb)
+
+def find_best_world():
+	best_worlds = set()
+	for w1 in worlds:
+		check = True
+		for w2 in worlds:
+			if w1.F > w2.F:
+				check = False
+		if check == True:		
+			#print("Check\n")
+			best_worlds.add(w1.name)
+	return best_worlds
 
 
 print("__________________________________________________________________________\n")
@@ -63,171 +277,64 @@ print("Name of file: %s \n" % (file_name))
 
 file = open(file_name, "r+")
 
-st = file.read()
-print(st)
+#for line in file: 
+#	print (line)
 
-propositions_char = set()
-
-for char in st:
-	if(char.isalpha()):
-		propositions_char.add(char)
+print("start")
+#print(st)
 
 
-for item in propositions_char:
-	print(item)
 
-propositions = set()
-for item in propositions_char:
-	new = Symbol(item)
-	propositions.add(new)
-
+propositions = obtain_atomic_formulas(file)
 print("Propositions: %s \n" % (propositions))
 
+file.seek(0)
 
-lines = [line.rstrip("\n") for line in open(file_name)]
-#lines = [line.lstrip("(") for line in lines]
-#lines = [line.rstrip(")") for line in lines]
-temp1 = [line[1:] for line in lines]
-temp2 = [line[:-1] for line in temp1]
-temp3 = [line.split(",") for line in temp2]
-dummy = []
+rules = construct_rules_dict(file)
 
-rules = []
-count = 0
-for line in temp3:
-	item = line[0] + "," + line[1]
-	name = "r" + str(count)
-	new = Rule(name, item, line[0], line[1])
-	rules.append(new)
-	count += 1
+for k, v in rules.items():
+	print(k, v.item)
 
-for i in rules:
-	print("%s: %s \n" %(i.name, i.item))
-
-
-num_worlds = list(range(2**len(propositions)))
-world_names = ["w" + str(i) for i in num_worlds]
-
-n = len(propositions)
-table = list(product([False, True], repeat=n))
-worlds = set()
-count = 0
-for row in table:
-	state = dict(zip(propositions, row))
-	new = World(world_names[count], state)
-	worlds.add(new)
-	#print(world)
-	#worlds[world_names[count]] = state
-	count +=1
-
-
-#pprint.pprint(table)
-
-print("Worlds")
+worlds = construct_worlds(propositions)
 for world in worlds:
 	print("%s: %s \n" % (world.name, world.state))
-for rule in rules:
 
-	th1 = set()
-	for char in str(rule.head):
-		if(char.isalpha()):
-			add = Symbol(char)
-			th1.add(add)
-	#th2 = propositions - th1
-	th2 = propositions.difference(th1)
-	#print("th2: %s, th1: %s\n" % (th2, th1))
-	item = ""
-	for p in th2:
-		item +=  "&" + "(" +str(p) + "|" +  "~" +  str(p) + ")"
-		#item += str(p) + "|" + " ~" + str(p)
-	#item = item[:-1]
-	head_check = rule.head + item
-	#print("Head check: " + head_check + "\n")
-
-	h_temp = satisfiable((head_check), all_models = True)
-	for model in h_temp:
-		new = {}	
-		for key in model:
-			new[key] = model[key]
-		rule.headExtension.append(new)
-
-	tb1 = set()
-	for char in str(rule.body):
-		if(char.isalpha()):
-			add = Symbol(char)
-			tb1.add(add)
-	#th2 = propositions - th1
-	tb2 = propositions.difference(tb1)
-	#print("th2: %s, th1: %s\n" % (tb2, tb1))
-	item = ""
-	for p in tb2:
-		item +=  "&" + "(" +str(p) + "|" +  "~" +  str(p) + ")"
-		#item += str(p) + "|" + " ~" + str(p)
-	#item = item[:-1]
-	body_check = rule.body + item
-	#print("Body check: " + body_check + "\n")
-
-	b_temp = satisfiable((body_check), all_models = True)
-	for model in b_temp:
-		new = {}	
-		for key in model:
-			new[key] = model[key]
-		rule.bodyExtension.append(new)
-
-
-
-
-for rule in rules:
-	print(" %s is satisified by \n" % (rule.head))
-	print(len(rule.headExtension))
-	for e in rule.headExtension:
-		print(e)
-	print(" %s is satisified by \n" % (rule.body))
-	for e in rule.bodyExtension:
-		print(e)
 
 '''for world in worlds:
-	print(world.name)
-	for rule in rules:
-		if(world.state in rule.bodyExtension):
-			print("Yes\n")
-		else:
-			print("No\n")
-	for rule in rules:
-		if(world.state in rule.headExtension):
-			print("Yes\n")
-		else:
-			print("No\n")'''
+	for v, k in world.state.items():
+		print(v, k)'''
 
-	#rule.Vhead = satisfiable((rule.head), all_models = True)
-	
-	#nbody = "~" + rule.head
-	#rule.Nhead = satisfiable((nbody), all_models = True)
-
-	#check_false = "~" + rule.head + " & " + rule.body
-	#print("check_false: %s \n" % check_false)
-	#rule.fw = satisfiable((check_false), all_models = True)
-	
+"""print("Worlds")
+for world in worlds:
+	print("%s: %s \n" % (world.name, world.state))"""
 
 
-#for rule in rules:
-#	rule.print_worlds()
+world_values(worlds)
 
 for world in worlds:
-	for r1 in rules:
-		for r2 in rules:
-			if world.state in r1.bodyExtension:
-				print("%s body in %s \n" % (r1.name, world.name))
-			if world.state in r2.bodyExtension:
-				print("%s body in %s \n" % (r2.name, world.name))
+	print(world.value)
 
-			if(world.state not in r1.bodyExtension or world.state in r2.bodyExtension):
-				if(world.state not in r1.headExtension or world.state not in r2.headExtension):
-					if(world.state in r2.bodyExtension and world.state not in r1.bodyExtension):
-						new = (r1.name, r2.name)
-						world.dom.add(new)
+assingn_rule_extensions(rules)
+
+assign_sets_rules(rules)
 
 
+#for k, rule in rules.items():
+	#print("%s Body extension: %s\n" % (rule.name, rule.setBodyExension))
+	#print("%s Head extension: %s\n" % (rule.name, rule.setHeadExension))
+
+'''for v, rule in rules.items():
+	#print(" %s is satisified by \n" % (rule.body))
+	#print(len(rule.bodyExtension))
+	#print(" %s is satisified by \n" % (rule.head))
+	#print(len(rule.headExtension))
+	for e in rule.setHeadExension:
+		print("head %s true in  %s " % (rule.name, e))
+		
+	for e in rule.setBodyExension:
+		print("body %s  true in %s " % (rule.name, e))'''
+
+domination_relations(worlds, rules)
 
 for world in worlds:
 	for d in world.dom:
@@ -235,84 +342,25 @@ for world in worlds:
 		print("%s in world %s \n" % (d, world.name))
 
 
-count = 0
-for i in rules:
-	print("%s: %s \n" % (count, i.body))
-	count += 1
+assing_rule_violations(worlds, rules)
+					
+for world in worlds:
+	for f in world.F:
+		print("%s is violated in %s \n" % (f, world.name))
 
 
-#for i in rules:
-#	for j in rules:
-
-
-
-'''K = a.keys() == b.keys()
-#print(K)
-#V = a.values() == b.values()
-#print(V)
-
-
-#print("Return Value : %s" %  cmp(a, b))
-
-
-#print(line[2])	
-
-p = "((P & ~Q), (R | ~P))"
-
-q = p.split(",")
-
-print(q)
-
-for i in q:
-	print(i)
-	i.lstrip('(')
-	i.rstrip(')')
-	i.rstrip(',')
-	#p = satisfiable(i)
-	#print(p)
-	print(i)'''
+#Now we finally seek out the best worlds
 
 
 
-'''r1 =(A | B)
-r2 =  (C & (B | D))
-r3 =  (A | (C & D))
-r4 = (~D | C)
-
-c1 = to_cnf(r1)
-c2= to_cnf(r2)
-c3= to_cnf(r3)
-c4= to_cnf(r4)
+best_worlds = find_best_world()
 
 
-print(" c1 is %s, c2 is %s, c3 is %s, c4 is
-lines = [line.rstrip('\n') for line in openfile_name)]
-total = (c1 & c2 & c3 & c4)
-
-print(total)
-
-s = satisfiable(total)
-print(s)
-com = (A | ~A)
-for key, value in s.items():
-	if(value == False):
-		add = key
-	else: 
-		add = Not(key)
-	com = (com & add)
-
-print(com)
-
-#
-total = (total & com)  
-print(total)
+for w in best_worlds:
+	print(w)
 
 
-s2 = satisfiable(total)
-print(s2)
 
-models = satisfiable((A | B), all_models = True)
 
-for model in models:
-	print(model)'''
+
 
