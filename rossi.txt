@@ -1,0 +1,12 @@
+# Rossi Example
+
+# F = fish, ~F = meat
+# W = white, ~W = red 
+# P = peaches, ~P = strawberries
+# D = Dinner
+
+((D | ~D), F)
+(F, W)
+(~F, ~W)
+((D | ~D), P)
+ 

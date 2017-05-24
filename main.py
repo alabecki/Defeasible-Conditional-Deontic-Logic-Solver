@@ -1,318 +1,312 @@
 #
-
-import sympy.abc
-from sympy.logic.boolalg import Not, And, Or
+#		Naive Preferences Solver_____________________________________________________________________________________________________________________________
+#
+#	The program reads txt files composed of rules in the following format:
+#		(b, h), where a and b are formulas of propositional logic
+#		b is the "body" of the rule, while h is the "head"
+#		"&" is used for "and", "|" is used for "or", and "~" is used for negation
+#		Example: ( (~P | (~Q | R)), (Q & P) )
+#
+#		The program makes use of the SAT solver included in sympy, which requires mpath
+#		It also utilizes the Symbol object, with which formulas are encoded for the purpose of using the SAT solver
+#
+#
+#		Import Libraries_____________________________________________________________________________________________________________________________________
 from sympy import Symbol
-from sympy.logic.inference import satisfiable
+from sympy.abc import*
 from sympy.logic.boolalg import to_cnf
-import mpmath
+from sympy.logic.boolalg import Not, And, Or
+from sympy.logic.inference import satisfiable
+from mpmath import*
 from itertools import product
-#import pprint 
+import sys
+from copy import deepcopy
+
+import re
+from preference_functions import*
+from preference_classes import Rule
+from preference_classes import World
+from preference_classes import Constraint
 
 
-class Rule(object):
-	def __init__(self, _name, _item, _body, _head):
-		self.name = _name
-		self.item = _item
-		self.body = _body
-		self.head = _head
-	
-		self.bodyExtension = []
-		self.headExtension = []
-		self.headWorlds = []
-		#self.vw = set()
-		#self.fw = set()
-		#self.nw = set()
-		self.dominates = set()
+commands = {
+	"w": "Show the set of most preferable  worlds",
+	"c": "Compare two specific worlds with resepect to preference",
+	"d": "Additional Queries",
+	"e": "I am done with this file"
+}
 
-class World(object):
-	def __init__ (self, _name, _state):
-		self.name = _name
-		self.state = _state
-		self.F = set()
-		self.dom = set()
+debugging = {
+	"1": "Show the world states at which a given rule is true",
+	"2": "Show the world states at which a given rule is violated",
+	"3": "Show which rules are violated at a given world",
+	"4": "Show which rules are false at a given world",
+	"5": "Show which rules are verified  at a given world",
+	"6": "Show which rules are neutral relative to a given world",
+	"7": "Show which domination relations obtain at a given world",
+	"8": "Show the worlds that violate the most rules",
+	"9": "Show the body extension of a rule",
+	"10": "Show the head extension of a rule",
+	"11": "For a given r/w pair, show which rules dominate r in w",
+	"12": "Check if world w is in body extension of a rule r",
+	"13": "Check if world w is in head extension of a rule r",
+	"14": "Print body of a rule",
+	"15": "Prind head of a rule"
+}
 
-	def print_worlds(self):
-		for model in self.vw:
-			print("%s is verified by: \n" % (self.item))
-		for model in self.vw:	
-			for key in model:
-				print("Here we go: %s: %s \n" % (key, model[key]))
-		for key in self.vw:
-			print("key: %s, value: %s \n" % (key, self.vw[key]))
-		print(" \n %s is violated by: \n" % (self.item))
-		for model in self.fw:
-			print(model)
-		print("\n %s is netural with respect to: \n" % (self.item))
-		for model in self.nw:
-			print(model)
-
-def compareDict(a, b):
-	Ka = set(a.keys())
-	Kb = set(b.keys())
-	Ba = set(a.values())
-	Bb = set(b.values())
-	V = (Ka == Kb) & (Ba == Bb)
+#		Main____________________________________________________________________________________________________________________________________________________
 
 
 print("__________________________________________________________________________\n")
 print("Welcome to the Naive Preferences Solver\n")
 print("___________________________________________________________________________\n")
-file_name = input("Please input the name of a text-file containing a set of rules (include the 'txt' extension) \n")
-print("Name of file: %s \n" % (file_name))
-
-file = open(file_name, "r+")
-
-st = file.read()
-print(st)
-
-propositions_char = set()
-
-for char in st:
-	if(char.isalpha()):
-		propositions_char.add(char)
 
 
-for item in propositions_char:
-	print(item)
-
-propositions = set()
-for item in propositions_char:
-	new = Symbol(item)
-	propositions.add(new)
-
-print("Propositions: %s \n" % (propositions))
-
-
-lines = [line.rstrip("\n") for line in open(file_name)]
-#lines = [line.lstrip("(") for line in lines]
-#lines = [line.rstrip(")") for line in lines]
-temp1 = [line[1:] for line in lines]
-temp2 = [line[:-1] for line in temp1]
-temp3 = [line.split(",") for line in temp2]
-dummy = []
-
-rules = []
-count = 0
-for line in temp3:
-	item = line[0] + "," + line[1]
-	name = "r" + str(count)
-	new = Rule(name, item, line[0], line[1])
-	rules.append(new)
-	count += 1
-
-for i in rules:
-	print("%s: %s \n" %(i.name, i.item))
-
-
-num_worlds = list(range(2**len(propositions)))
-world_names = ["w" + str(i) for i in num_worlds]
-
-n = len(propositions)
-table = list(product([False, True], repeat=n))
-worlds = set()
-count = 0
-for row in table:
-	state = dict(zip(propositions, row))
-	new = World(world_names[count], state)
-	worlds.add(new)
-	#print(world)
-	#worlds[world_names[count]] = state
-	count +=1
-
-
-#pprint.pprint(table)
-
-print("Worlds")
-for world in worlds:
-	print("%s: %s \n" % (world.name, world.state))
-for rule in rules:
-
-	th1 = set()
-	for char in str(rule.head):
-		if(char.isalpha()):
-			add = Symbol(char)
-			th1.add(add)
-	#th2 = propositions - th1
-	th2 = propositions.difference(th1)
-	#print("th2: %s, th1: %s\n" % (th2, th1))
-	item = ""
-	for p in th2:
-		item +=  "&" + "(" +str(p) + "|" +  "~" +  str(p) + ")"
-		#item += str(p) + "|" + " ~" + str(p)
-	#item = item[:-1]
-	head_check = rule.head + item
-	#print("Head check: " + head_check + "\n")
-
-	h_temp = satisfiable((head_check), all_models = True)
-	for model in h_temp:
-		new = {}	
-		for key in model:
-			new[key] = model[key]
-		rule.headExtension.append(new)
-
-	tb1 = set()
-	for char in str(rule.body):
-		if(char.isalpha()):
-			add = Symbol(char)
-			tb1.add(add)
-	#th2 = propositions - th1
-	tb2 = propositions.difference(tb1)
-	#print("th2: %s, th1: %s\n" % (tb2, tb1))
-	item = ""
-	for p in tb2:
-		item +=  "&" + "(" +str(p) + "|" +  "~" +  str(p) + ")"
-		#item += str(p) + "|" + " ~" + str(p)
-	#item = item[:-1]
-	body_check = rule.body + item
-	#print("Body check: " + body_check + "\n")
-
-	b_temp = satisfiable((body_check), all_models = True)
-	for model in b_temp:
-		new = {}	
-		for key in model:
-			new[key] = model[key]
-		rule.bodyExtension.append(new)
-
-
-
-
-for rule in rules:
-	print(" %s is satisified by \n" % (rule.head))
-	print(len(rule.headExtension))
-	for e in rule.headExtension:
-		print(e)
-	print(" %s is satisified by \n" % (rule.body))
-	for e in rule.bodyExtension:
-		print(e)
-
-'''for world in worlds:
-	print(world.name)
-	for rule in rules:
-		if(world.state in rule.bodyExtension):
-			print("Yes\n")
+while(True):
+	do = ""
+	print("What would you like to do? \n")
+	while(do != "1" and do !="2"):
+		do = input("(1) Open a file, (2), exit program\n")
+		if(do == "2"):
+			sys.exit()
+		if(do == "1"):
+			file = get_file()
+			#file_name = _file_name + ".txt"
 		else:
-			print("No\n")
-	for rule in rules:
-		if(world.state in rule.headExtension):
-			print("Yes\n")
+			print("I'm sorry, could you repeat your command? \n")
+
+
+	print("Processing rules____________________________________________________________ \n")
+
+
+	propositions = obtain_atomic_formulas(file)
+
+	file.seek(0)
+
+	rules = construct_rules_dict(file)		#parces input text, make a Rule object for each rule, saves objects in dictionary
+
+	file.seek(0)
+
+	constraints = add_constraints(file)		#parces and saves contraints in a dictionary
+
+	for k, v in rules.items():
+		print(k, v.item)
+
+	_worlds = construct_worlds(propositions)
+
+
+	for k, constraint in constraints.items():
+		constraint.extension = assign_extensions(constraint.item, _worlds, propositions)
+		for ext in constraint.extension:
+			print(" %s : %s \n" % (k, ext))
+
+	worlds = {}
+
+	flag = True
+	for w, world in _worlds.items():
+		flag = True
+		for constraint in constraints.values():
+			for ext in constraint.extension:
+				if world.state == ext:
+					print("Check if equal \n")
+					flag = False
+		if flag == True:
+				worlds[w] = world
+
+
+	for w in worlds.values():
+		print(w.state)
+
+
+
+	for k, rule in rules.items():
+		rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
+		rule.headExtension = assign_extensions(rule.head, worlds, propositions)
+
+
+	domination_relations(worlds, rules)
+
+	assign_rule_violations(worlds, rules)
+
+	_continue = True
+
+	while(True):
+
+		print("________________________________________________________________________________ \n")
+		print(" What would you like to know? \n")
+
+		for k, v in commands.items():
+			print("%s: %s \n" % (k, v))
+		com = input()
+		if(com == "w"):
+			best_worlds = find_best_world(worlds)
+			print("\n")
+			print(" The most preferred worlds are: \n")
+			for k, v in best_worlds.items():
+				print("%s: %s \n" % (k, v))
+
+		elif(com == "c"):
+			print("Which two worlds would you like to compare? \n")
+			for world in worlds.values():
+				print("%s: %s \n" % (world.name, world.state))
+			_pair = input("which two worlds would you like to compare? (write as: 'wi, wj', where i, j are integers) \n")
+			pair = _pair.split(",")
+			compare_worlds(pair[0], pair[1], worlds)
+		elif(com == "d"):
+			com1 = " "
+			_choices = list(range(1, 16))
+			choices = ''.join(str(e) for e in _choices)
+			while (str(com1) not in choices):
+				for k, v in debugging.items():
+					print("%s: %s \n" % (k, v))
+				com1 = input()
+				if com1 == "1":
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					result = find_rule_extension(_rule, rules, worlds)
+					print("%s is true in the following worlds:\n" % (_rule))
+					for w in result:
+						print(w)
+				elif(com1 == "2"):
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					result = find_rule_violations(_rule, rules, worlds)
+					if (result) == {}:
+						print("%s is not violated in any world" % (_rule))
+					else:
+						print("%s is violated in the following worlds:\n" % (_rule))
+						for w in result:
+							print("%s : %s \n" % (w.name, w.state))
+
+				elif(com1 == "3"):
+					print("For which world would you like to make your query? (type in name) \n")
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which world would you like to make your query? (type in name) \n")
+					_world =check_world_input(worlds)
+					result = print_violations(_world, worlds)
+					print("World %s violates the following rules:\n " % (_world))
+					print(result)
+				elif(com1 == "4"):
+					print("For which world would you like to make your query?")
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which world would you like to make your query? (type in name) \n")
+					_world =check_world_input(worlds)
+					result = print_false_rules_at_w(_world, rules, worlds)
+					print("The following rules are false in " + _world)
+					print(result)
+				elif(com1 == "5"):
+					print("For which world would you like to make your query?")
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which world would you like to make your query? (type in name) \n")
+					_world =check_world_input(worlds)
+					result = print_rules_true_at_w(_world, rules, worlds)
+					print("The following rules are true in " + _world)
+					print(result)
+				elif(com1 == "6"):
+					print("For which world would you like to make your query?")
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which world would you like to make your query? (type in name) \n")
+					_world =check_world_input(worlds)
+					result = print_rules_neutral_at_w(_world, rules, worlds)
+					print("The following rules are neutral in " + _world)
+					print(result)
+				elif(com1 == "7"):
+					print("For which world would you like to make your query?")
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which world would you like to make your query? (type in name) \n")
+					_world =check_world_input(worlds)
+					print("The following dominition relations between rules obtain in " + _world + " (where the left rule dominates the right): \n")
+					#temp = int(_world[1:])
+					print(worlds[_world].dom)
+				elif(com1 == "8"):
+					print("The most violated worlds are: \n")
+					res = worst_worlds(worlds)
+					print(res)
+				elif(com1 == "9"):
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
+				elif(com1 == "10"):
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					print("Head extension of %s is:  %s \n" % (rules[_rule].head, rules[_rule].headExtension))
+				elif(com1 == "11"):
+					print("For which rule and world are you checking? (write as ri, wi)\n")
+					pair = check_rule_world_pair_input(worlds, rules)
+					_rule = pair[0]
+					_world = pair[1]
+					res = dom_of_r_in_w(_rule, _world, rules, worlds)
+					_world = re.sub(r"\s+", "", _world)
+					_world = int(_world[1:])
+					print(_world)
+					print("%s is dominated by %s in w%s: %s" % (_rule, res, _world, worlds[_world].state))
+				elif(com1 == "12"):
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which rule and world are you checking? (write as ri, wi)\n")
+					pair = check_rule_world_pair_input(worlds, rules)
+					_rule = pair[0]
+					_world = pair[1]
+					#_world = re.findall(r'\d+', _world)
+					#_world = int(_world[0])
+					print("temp: %s, _rule: %s \n" % (_world, _rule))
+					if worlds[_world].state in rules[_rule].bodyExtension:
+						print("True\n")
+						print("%s is in the extension of %s" % (worlds[_world].state, rules[_rule].body))
+					else:
+						print("False\n")
+						print("%s is not in the extension of %s" % (worlds[_world].state, rules[_rule].body))
+				elif(com1 == "13"):
+					for world in worlds.values():
+						print("%s: %s \n" % (world.name, world.state))
+					print("For which rule and world are you checking? (write as ri, wi)\n")
+					pair = check_rule_world_pair_input(worlds, rules)
+					_rule = pair[0]
+					_world = pair[1]
+					#_world = re.findall(r'\d+', _world)
+					#_world = int(_world[0])
+					if worlds[_world].state in rules[_rule].headExtension:
+						print("True\n")
+						print("%s is in the extension of %s" % (worlds[_world].state, rules[_rule].head))
+					else:
+						print("False\n")
+						print("%s is not in the extension of %s" % (worlds[temp].state, rules[_rule].head))
+				elif(com1 == "14"):
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					print(rules[_rule].body)
+				elif(com1 == "15"):
+					print("For which rule would you like to make your query? (type in name) \n")
+					for k, rule in rules.items():
+						print("%s: %s \n" % (k, rule.item))
+					_rule =  check_rule_input(rules)
+					print(rules[_rule].head)
+
+
+
+				else:
+					print("I'm sorry, you did not input a recognized command, please try again. \n")
+		elif(com == "e"):
+			break
 		else:
-			print("No\n")'''
-
-	#rule.Vhead = satisfiable((rule.head), all_models = True)
-	
-	#nbody = "~" + rule.head
-	#rule.Nhead = satisfiable((nbody), all_models = True)
-
-	#check_false = "~" + rule.head + " & " + rule.body
-	#print("check_false: %s \n" % check_false)
-	#rule.fw = satisfiable((check_false), all_models = True)
-	
-
-
-#for rule in rules:
-#	rule.print_worlds()
-
-for world in worlds:
-	for r1 in rules:
-		for r2 in rules:
-			if world.state in r1.bodyExtension:
-				print("%s body in %s \n" % (r1.name, world.name))
-			if world.state in r2.bodyExtension:
-				print("%s body in %s \n" % (r2.name, world.name))
-
-			if(world.state not in r1.bodyExtension or world.state in r2.bodyExtension):
-				if(world.state not in r1.headExtension or world.state not in r2.headExtension):
-					if(world.state in r2.bodyExtension and world.state not in r1.bodyExtension):
-						new = (r1.name, r2.name)
-						world.dom.add(new)
-
-
-
-for world in worlds:
-	for d in world.dom:
-		#for p in d:
-		print("%s in world %s \n" % (d, world.name))
-
-
-count = 0
-for i in rules:
-	print("%s: %s \n" % (count, i.body))
-	count += 1
-
-
-#for i in rules:
-#	for j in rules:
-
-
-
-'''K = a.keys() == b.keys()
-#print(K)
-#V = a.values() == b.values()
-#print(V)
-
-
-#print("Return Value : %s" %  cmp(a, b))
-
-
-#print(line[2])	
-
-p = "((P & ~Q), (R | ~P))"
-
-q = p.split(",")
-
-print(q)
-
-for i in q:
-	print(i)
-	i.lstrip('(')
-	i.rstrip(')')
-	i.rstrip(',')
-	#p = satisfiable(i)
-	#print(p)
-	print(i)'''
-
-
-
-'''r1 =(A | B)
-r2 =  (C & (B | D))
-r3 =  (A | (C & D))
-r4 = (~D | C)
-
-c1 = to_cnf(r1)
-c2= to_cnf(r2)
-c3= to_cnf(r3)
-c4= to_cnf(r4)
-
-
-print(" c1 is %s, c2 is %s, c3 is %s, c4 is
-lines = [line.rstrip('\n') for line in openfile_name)]
-total = (c1 & c2 & c3 & c4)
-
-print(total)
-
-s = satisfiable(total)
-print(s)
-com = (A | ~A)
-for key, value in s.items():
-	if(value == False):
-		add = key
-	else: 
-		add = Not(key)
-	com = (com & add)
-
-print(com)
-
-#
-total = (total & com)  
-print(total)
-
-
-s2 = satisfiable(total)
-print(s2)
-
-models = satisfiable((A | B), all_models = True)
-
-for model in models:
-	print(model)'''
-
+			print("I'm sorry, you did not input a recognized command, please try again. \n")
+		more = ""
+		while(more != "y" and more != "n"):
+			more = input("Would you like to make another query?  (y, n) \n")
+			if(more == 'n'):
+				break

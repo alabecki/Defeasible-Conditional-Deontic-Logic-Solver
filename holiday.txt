@@ -1,0 +1,12 @@
+#Holiday
+# S = Visit Sweeden
+# T = Visit Turky
+# F = Visit France
+
+( , P)
+(~P, T)
+(~T & ~P, F)
+
+!(P & T)
+!(P & F)
+!(T & F)
