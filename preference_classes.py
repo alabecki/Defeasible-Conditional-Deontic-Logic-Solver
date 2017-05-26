@@ -12,6 +12,7 @@ class Rule(object):
 													# each element of the form {A: True, B: False, .... }
 		self.headExtension = []						# the worlds states at which the head of the rule is True
 													# each element of the form {A: True, B: False, .... }
+		self.dominatedBy = set()
 
 class World(object):
 	def __init__ (self, _name, _state):
