@@ -1,0 +1,7 @@
+
+#asd
+#comment
+(a|c, ~b)
+(a, b)
+((a & ~c), ~b)
+#((a&~c&d), b)

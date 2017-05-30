@@ -16,22 +16,23 @@ from sympy import Symbol
 from sympy.abc import*
 from sympy.logic.boolalg import to_cnf
 from sympy.logic.boolalg import Not, And, Or
-from sympy.logic.inference import satisfiable
+from sympy.logic.inference import satisfiable, valid
 from mpmath import*
 from itertools import product
 import sys
 from copy import deepcopy
 
 import re
-from preference_functions import*
-from preference_classes import Rule
-from preference_classes import World
-from preference_classes import Constraint
+from preferences_core_functions import*
+from preferences_query_functions import*
+from preference_classes import*
 
 
 commands = {
 	"w": "Show the set of most preferable  worlds",
 	"c": "Compare two specific worlds with resepect to preference",
+	"o": "Detemine whether, given our preferences, the truth of a makes b obligatory (user povides a and b)",
+	"r": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a, b))",
 	"d": "Additional Queries",
 	"e": "I am done with this file"
 }
@@ -39,11 +40,11 @@ commands = {
 debugging = {
 	"1": "Show the world states at which a given rule is true",
 	"2": "Show the world states at which a given rule is violated",
-	"3": "Show which rules are violated at a given world",
+	"3": "Show which rules are violated at each world",
 	"4": "Show which rules are false at a given world",
 	"5": "Show which rules are verified  at a given world",
 	"6": "Show which rules are neutral relative to a given world",
-	"7": "Show which domination relations obtain at a given world",
+	"7": "Show set of domination relations between rules",
 	"8": "Show the worlds that violate the most rules",
 	"9": "Show the body extension of a rule",
 	"10": "Show the head extension of a rule",
@@ -51,7 +52,7 @@ debugging = {
 	"12": "Check if world w is in body extension of a rule r",
 	"13": "Check if world w is in head extension of a rule r",
 	"14": "Print body of a rule",
-	"15": "Prind head of a rule"
+	"15": "Print head of a rule",
 }
 
 #		Main____________________________________________________________________________________________________________________________________________________
@@ -94,6 +95,9 @@ while(True):
 
 	_worlds = construct_worlds(propositions)
 
+	for k, v in constraints.items():
+		print(k, v.item)
+
 
 	for k, constraint in constraints.items():
 		constraint.extension = assign_extensions(constraint.item, _worlds, propositions)
@@ -102,18 +106,30 @@ while(True):
 
 	worlds = {}
 
+	#flag = True
+	#for w, world in _worlds.items():
+		#flag = True
+		#for constraint in constraints.values():
+			#for ext in constraint.extension:
+				#if world.state == ext:
+					#print("Check if equal \n")
+					#flag = False
+		#if flag == True:
+			#	worlds[w] = world
+
 	flag = True
 	for w, world in _worlds.items():
 		flag = True
 		for constraint in constraints.values():
-			for ext in constraint.extension:
-				if world.state == ext:
-					print("Check if equal \n")
-					flag = False
+			print("World: %s, constraint %s \n" % (world.state, constraint.item))
+			if world.state not in constraint.extension:
+				flag = False
 		if flag == True:
-				worlds[w] = world
+			print("Constraint passed")
+			worlds[w] = world
 
 
+	print("Worlds after constraints: \n")
 	for w in worlds.values():
 		print(w.state)
 
@@ -123,10 +139,13 @@ while(True):
 		rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
 		rule.headExtension = assign_extensions(rule.head, worlds, propositions)
 
+	dominations = set()
 
-	domination_relations(worlds, rules)
+	domination_relations(rules, dominations)
 
-	assign_rule_violations(worlds, rules)
+	#domination_relations(worlds, rules)
+
+	assign_rule_violations(worlds, rules, dominations)
 
 	_continue = True
 
@@ -143,7 +162,7 @@ while(True):
 			print("\n")
 			print(" The most preferred worlds are: \n")
 			for k, v in best_worlds.items():
-				print("%s: %s \n" % (k, v))
+				print("%s: %s \n" % (k, v.state))
 
 		elif(com == "c"):
 			print("Which two worlds would you like to compare? \n")
@@ -152,6 +171,49 @@ while(True):
 			_pair = input("which two worlds would you like to compare? (write as: 'wi, wj', where i, j are integers) \n")
 			pair = _pair.split(",")
 			compare_worlds(pair[0], pair[1], worlds)
+
+		elif(com == "o"):
+			best_worlds = find_best_world(worlds)
+			p = input("Please enter the first formula using &, ~, and | as operators \n")
+			q = input("Please enter the second fomula using &, ~, and | as operators \n")
+			add_proposition(propositions, p)
+			add_proposition(propositions, q)
+			p = Symbol(p)
+			q = Symbol(q)
+			p_ext = assign_extensions(p, worlds, propositions)
+			q_ext = assign_extensions(q, worlds, propositions)
+			b = check_inference(p_ext, q_ext, best_worlds, worlds)
+			if b == True:
+				print("Given our preferences, %s obgliates %s \n" % (p, q))
+			if b == False:
+				print("Given our preferences, %s does not obligate %s \n" % (p, q))
+
+		elif(com == "r"):
+			r = input("Please enter a new rule in the same format as in the txt. file \n")
+			current_num_proposition = len(propositions)
+			add_proposition(propositions, r)
+			worlds2 = deepcopy(worlds)
+			if(len(propositions) > current_num_proposition):
+				_worlds2 = construct_worlds(propositions)
+				for k, constraint in constraints.items():
+					constraint.extension = assign_extensions(constraint.item, _worlds, propositions)
+				worlds2 = {}
+				flag = True
+				for w, world in _worlds2.items():
+					flag = True
+					for constraint in constraints.values():
+						print("World: %s, constraint %s \n" % (world.state, constraint.item))
+						if world.state not in constraint.extension:
+							flag = False
+					if flag == True:
+						worlds2[w] = world
+			rules2 = deepcopy(rules)
+			best_worlds = find_best_world(worlds)
+			if implicit_rule(r, best_worlds, rules2, worlds2, propositions) == True:
+				print("Yes, %s is implied by the other rules \n" % (r))
+			else:
+				print("No, %s is not implied by the other rules \n" % (r))
+
 		elif(com == "d"):
 			com1 = " "
 			_choices = list(range(1, 16))
@@ -160,6 +222,8 @@ while(True):
 				for k, v in debugging.items():
 					print("%s: %s \n" % (k, v))
 				com1 = input()
+
+
 				if com1 == "1":
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
@@ -183,23 +247,15 @@ while(True):
 							print("%s : %s \n" % (w.name, w.state))
 
 				elif(com1 == "3"):
-					print("For which world would you like to make your query? (type in name) \n")
+					print("The following worlds violate the following rules: \n")
 					for world in worlds.values():
-						print("%s: %s \n" % (world.name, world.state))
-					print("For which world would you like to make your query? (type in name) \n")
-					_world =check_world_input(worlds)
-					result = print_violations(_world, worlds)
-					print("World %s violates the following rules:\n " % (_world))
-					print(result)
+						print("%s %s: %s \n" % (world.name, world.state, world.F))
 				elif(com1 == "4"):
-					print("For which world would you like to make your query?")
-					for world in worlds.values():
-						print("%s: %s \n" % (world.name, world.state))
-					print("For which world would you like to make your query? (type in name) \n")
-					_world =check_world_input(worlds)
-					result = print_false_rules_at_w(_world, rules, worlds)
-					print("The following rules are false in " + _world)
-					print(result)
+					print("\n")
+					for w in worlds.values():
+						item = print_false_rules_at_w(w.name, rules, worlds)
+						print(w.state, item)
+
 				elif(com1 == "5"):
 					print("For which world would you like to make your query?")
 					for world in worlds.values():
@@ -219,18 +275,20 @@ while(True):
 					print("The following rules are neutral in " + _world)
 					print(result)
 				elif(com1 == "7"):
-					print("For which world would you like to make your query?")
-					for world in worlds.values():
-						print("%s: %s \n" % (world.name, world.state))
-					print("For which world would you like to make your query? (type in name) \n")
-					_world =check_world_input(worlds)
-					print("The following dominition relations between rules obtain in " + _world + " (where the left rule dominates the right): \n")
+					print("The following domination relations obtain: \n" )
+					for rule in rules.values():
+						if (len(rule.dominatedBy) != 0):
+							print("%s is dominated by: " % (rule.name))
+							for dom in rule.dominatedBy:
+								print(dom.name)
 					#temp = int(_world[1:])
-					print(worlds[_world].dom)
+					#print(worlds[_world].dom)
 				elif(com1 == "8"):
-					print("The most violated worlds are: \n")
+					print("The following worlds violate the most rules: \n")
 					res = worst_worlds(worlds)
-					print(res)
+					for w in res:
+						print("%s: %s \n" % (w.name, w.F))
+
 				elif(com1 == "9"):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
@@ -262,7 +320,6 @@ while(True):
 					_world = pair[1]
 					#_world = re.findall(r'\d+', _world)
 					#_world = int(_world[0])
-					print("temp: %s, _rule: %s \n" % (_world, _rule))
 					if worlds[_world].state in rules[_rule].bodyExtension:
 						print("True\n")
 						print("%s is in the extension of %s" % (worlds[_world].state, rules[_rule].body))
@@ -302,6 +359,7 @@ while(True):
 				else:
 					print("I'm sorry, you did not input a recognized command, please try again. \n")
 		elif(com == "e"):
+			file.close()
 			break
 		else:
 			print("I'm sorry, you did not input a recognized command, please try again. \n")
