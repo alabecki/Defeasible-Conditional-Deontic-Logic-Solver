@@ -13,7 +13,7 @@ def compare_worlds(u, v, worlds):
 	elif (worlds[u].F >= worlds[v].F):
 		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
 		return
-	elif worlds[b].F >= worlds[a].F:
+	elif worlds[v].F >= worlds[u].F:
 		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
 		return
 	else:

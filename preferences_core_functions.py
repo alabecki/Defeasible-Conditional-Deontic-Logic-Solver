@@ -10,6 +10,7 @@ from itertools import product
 from preference_classes import Rule
 from preference_classes import World
 from preference_classes import Constraint
+from preferences_query_functions import*
 import os
 import re
 from copy import deepcopy
@@ -67,11 +68,11 @@ def construct_rules_dict(file):
 	return rules
 
 def add_rule(rule, rules):
-	count = len(rules) + 1
+	count = len(rules)
 	temp1 = rule[1:]
 	temp2 = temp1[:-1]
 	temp3 = temp2.split(",")
-	print("New body: %s, new head: %s \n" % (temp3[0], temp3[1]))
+	#print("New body: %s, new head: %s \n" % (temp3[0], temp3[1]))
 	item = temp3[0] + "," + temp3[1]
 	name = "r" + str(count)
 	new = Rule(name, item, temp3[0], temp3[1])
@@ -83,15 +84,14 @@ def add_constraints(file):
 	for line in file:
 		if line.startswith("!"):
 			lines.append(line.strip())
-		for line in lines:
-			print("WTF?")
-			print(line)
+		#for line in lines:
+			#print(line)
 	temp1 = [line[1:] for line in lines]		#remove "!(" at the beginning of the rule
 	#temp2 = [line[:-1] for line in temp1]		#remove the ")" at the end of the rule
 	constraints = {}
 	count = 0
 	for line in temp1:
-		print(temp1)
+		#print(temp1)
 		name = "c" + str(count)
 		new = Constraint(name, line)
 		constraints.update({name: new})
@@ -125,7 +125,7 @@ def construct_worlds(propositions):
 def assign_extensions(formula, worlds, propositions):
 	extension = []
 	if str(formula).isspace():			#if the formula is empty it will be treated as a toutology
-		print("Check Empty\n")
+		#print("Check Empty\n")
 		for w in worlds.values():
 			extension.append(w.state)
 		return extension
@@ -137,8 +137,8 @@ def assign_extensions(formula, worlds, propositions):
 		props_not_in_form = propositions.difference(props_in_formula)	#Determine which propositions are missing from the rule's body
 		supplement = Symbol('')
 		#print("Formula: %s " % (formula))
-		print("Formula: %s \n " % (formula))
-		print("Prop not in form: %s \n " % (props_not_in_form))
+		#print("Formula: %s \n " % (formula))
+		#print("Prop not in form: %s \n " % (props_not_in_form))
 		form_cnf = to_cnf(formula)
 		#print("cnf: %s \n " % (form_cnf))
 		print(form_cnf)
@@ -147,7 +147,7 @@ def assign_extensions(formula, worlds, propositions):
 			#print("form_cnf: %s, supplement: %s \n" % (form_cnf, supplement) )							#Loop aguments (P | ~P) for each P not found in body
 			form_cnf = And(form_cnf, supplement)
 		#print("__form_cnf: %s \n" % (form_cnf))
-		print(form_cnf)
+		#print(form_cnf)
 		form_SAT = satisfiable(form_cnf, all_models = True)  #The sympy SAT solver is applied to the augmented formula
 		form_SAT_list = list(form_SAT)				       #the ouput of satisfiable() is an itterator object so we turn it into a list
 		if(len(form_SAT_list) == 1 and form_SAT_list[0] == False):		#check to handle inconsistencies
@@ -172,10 +172,19 @@ def domination_relations(rules, dominations):
 				#First check for "improper" domination
 				#r1b = set(r1.bodyExtension)
 				#r2b = set(r2.bodyExtension)
-			print(r1.body, r2.body)
-			if (str(r1.body).isspace() or str(r2.body).isspace() ):
-			#	print("Check if either one has empty body")
+			#print(r1.body, r2.body)
+			if (str(r1.body).isspace() and str(r2.body).isspace() ):
 				continue
+			if str(r1.body).isspace():
+				continue
+			elif str(r2.body).isspace():
+				r1h_cnf = to_cnf(r1.head)
+				r2h_cnf = to_cnf(r2.head)
+				temp3 = And(r1h_cnf, r2h_cnf )
+				notbothheads = Not(temp3)
+				if valid(notbothheads) == True:
+					r2.dominatedBy.add(r1)
+			#	print("Check if either one has empty body")
 			else:
 				r1b_cnf = to_cnf(r1.body)
 				r2b_cnf = to_cnf(r2.body)
@@ -199,7 +208,6 @@ def domination_relations(rules, dominations):
 						if (r2.item != r1.item):
 							r2.dominatedBy.add(r1)
 
-
 # We use the extensions assigned to rules and the domination relations to determine which rules are violated in each world
 def dom_dom_check(world, rule, flag):
 	for dom in rule.dominatedBy:
@@ -220,25 +228,25 @@ def dom_dom_check(world, rule, flag):
 def assign_rule_violations(worlds, rules, dominations):
 	print("Assigning rule violations ________________________________________________________________________________")
 	for world in worlds.values():
-		print(world.state)
+		#print(world.state)
 		for k, rule in rules.items():
-			print(k)
+			#print(k)
 			#First check if the rule is False in the world under consideration
 			if(world.state in rule.bodyExtension and world.state not in rule.headExtension):
-			#	print("%s is false in %s \n" % (rule.name, world.state ))
+				#print("%s is false in %s \n" % (rule.name, world.state ))
 			#Now make sure that, if the rule is dominated by any other rules in this world, then that other rule
 			#is Neutral in this world.
 				flag = 0
 				for dom in rule.dominatedBy:
 					#print("Next dom: %s \n " % (dom.name))
 					if (world.state not in dom.bodyExtension):
-					#	print("This dom %s neutral \n" % (dom.name))
+						#print("This dom %s neutral \n" % (dom.name))
 						continue
-				#	print("About to send %s into recursion \n" % (dom.name))
+					#print("About to send %s into recursion \n" % (dom.name))
 					flag += 1
 					#print("Flag before recusion %s \n" % (flag))
 					flag = dom_dom_check(world, dom, flag)
-				#	print("Just got back from recusion and flag is %s \n" % (flag))
+					#print("Just got back from recusion and flag is %s \n" % (flag))
 				if flag % 2 == 0:
 					#print("Final Flag: %s \b" % (flag))
 					#print("%s violates %s \n" % (world.state, k))
@@ -260,26 +268,83 @@ def find_best_world(worlds):
 			#best_worlds.add(w1.name)
 	return best_worlds
 
-
 def add_proposition(propositions, p):
 	for char in p:
 		if (str(char).isalpha()):
 			propositions.add(Symbol(char))
 
+def reconstruct_worlds(propositions, constraints):
+	#worlds2 = deepcopy(worlds)
+	_worlds2 = construct_worlds(propositions)
+	for k, constraint in constraints.items():
+		constraint.extension = assign_extensions(constraint.item, _worlds2, propositions)
+	worlds2 = {}
+	flag = True
+	for w, world in _worlds2.items():
+		flag = True
+		for constraint in constraints.values():
+		#	print("World: %s, constraint %s \n" % (world.state, constraint.item))
+			if world.state not in constraint.extension:
+				flag = False
+		if flag == True:
+			worlds2[w] = world
+	return worlds2
 
-def check_inference(f1ext, f2ext, best_worlds, worlds):
+
+#def get_min_F(f_ext, worlds):
+	#sorted_worlds = sorted(worlds.values(), key = lambda x: len(x.F))
+	#card = 1000
+	#for w in sorted_worlds:
+	#	if w.state in f_ext:
+	#		if len(w.F) < card:
+	#			card = len(w.F)
+	#f_min = set()
+#	print("check")
+#	for w, world in worlds.items():
+	#	if len(world.F) == card and world.state in f_ext:
+		#	f_min.add(world)
+#	print( "\n")
+	#return f_min
+
+def get_min_F(f_ext, worlds):
+	f_min = set()
+	for e1 in f_ext:
+		w1 = get_world_from_state(e1, worlds)
+		f_min.add(worlds[w1])
+		for e2 in f_ext:
+			w2 = get_world_from_state(e2, worlds)
+			if worlds[w2].F < worlds[w1].F:
+				f_min.remove(worlds[w1])
+				break
+	return f_min
+
+
+
+
+def obligation_implication(f1_min, f2ext, worlds):
 	Flag = True
-	for k, w in best_worlds.items():
-		if w.state in f1ext and not w.state in f2ext:
+	for w in f1_min:
+		if w.state not in f2ext:
 			Flag = False
+			return False
+	if Flag == True:
+		return True
+	else:
+		return False
+
+def permissable_implication(f1_min, f2ext, worlds):
+	Flag = False
+	for w in f1_min:
+		if w.state in f2ext:
+			Flag = True
+			return True
 	if Flag == True:
 		return True
 	else:
 		return False
 
 
-def implicit_rule(r, best_worlds, rules2, worlds2, propositions2):
-	#first add r as a new rule
+def implicit_rule(r, worlds, worlds2, propositions2, rules2):
 	add_rule(r, rules2)
 	for k, rule in rules2.items():
 		rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
@@ -287,18 +352,46 @@ def implicit_rule(r, best_worlds, rules2, worlds2, propositions2):
 	dominations2 = set()
 	domination_relations(rules2, dominations2)
 	assign_rule_violations(worlds2, rules2, dominations2)
-	new_best_worlds = find_best_world(worlds2)
-	print("New best worlds: \n")
-	for k, v in new_best_worlds.items():
-		print("%s: %s \n" % (k, v.state))
-	print("Old best  worlds: \n")
-	for k, v in best_worlds.items():
-		print("%s: %s \n" % (k, v.state))
-	old = set(best_worlds.keys())
-	new = set(new_best_worlds.keys())
 
+	flag = True
+	for w2i, world2i in worlds2.items():
+		print(w2i, world2i.state)
+		for w2j, world2j in worlds2.items():
+			print(w2j, world2j.state)
+			if world2i.F < world2j.F:
+				print("new")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if worlds[w2i].F >= worlds[w2j].F:
+					flag = False
+					return flag
+			elif world2i.F >= world2j.F:
+				if worlds[w2i].F < worlds[w2j].F:
+					flag = False
+					return flag
+	flag = True
+	return flag
 
-	if old == new:
-		return True
-	else:
-		return False
+#def implicit_rule(r, best_worlds, rules2, worlds2, propositions2):
+	#first add r as a new rule
+	#add_rule(r, rules2)
+	#for k, rule in rules2.items():
+		#rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
+#		rule.headExtension = assign_extensions(rule.head, worlds2, propositions2)
+	#dominations2 = set()
+	#domination_relations(rules2, dominations2)
+	#assign_rule_violations(worlds2, rules2, dominations2)
+	#new_best_worlds = find_best_world(worlds2)
+	#print("New best worlds: \n")
+	#for k, v in new_best_worlds.items():
+	#	print("%s: %s \n" % (k, v.state))
+	#print("Old best  worlds: \n")
+	#for k, v in best_worlds.items():
+	#	print("%s: %s \n" % (k, v.state))
+	#old = set(best_worlds.keys())
+	#new = set(new_best_worlds.keys())
+	#if old == new:
+	#	return True
+	#else:
+	#	return False
