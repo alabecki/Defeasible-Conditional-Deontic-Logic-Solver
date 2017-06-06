@@ -60,7 +60,8 @@ debugging = {
 	"9": "Show the head extension of a rule",
 	"10": "Print body of a rule",
 	"11": "Print head of a rule",
-	"12": "Show constraints"
+	"12": "Show constraints",
+	"13": "Show weights of rules"
 }
 
 #Main_____________________________________________________________________________________________________________________
@@ -161,12 +162,29 @@ while(True):
 		elif(com == "3"):
 			print("The following worlds violate the following rules: \n")
 			for world in worlds.values():
-				print("%s %s: %s \n" % (world.name, world.state, world.F))
+				print("%s %s: %s , %s\n" % (world.name, world.state, world.F, world.weightedF))
 
 		elif(com == "4"):
 			formula = input("Please write a formula to check \n")
 			formula_ext = assign_extensions(formula, worlds, propositions)
-			formula_min = get_min_F(formula_ext, worlds)
+			print("How would you like to evaulate the preference relationship between worlds? \n")
+			for k, v in evaluation_method.items():
+				print(k, v)
+			method = input()
+			if method == "1":
+				formula_min = get_min_F_subset(formula_ext, worlds)
+				for w in formula_min:
+					print (w.name, w.state, w.F)
+			if method == "2":
+				formula_min = get_min_F_card(formula_ext, worlds)
+				for w in formula_min:
+					print (w.name, w.state, w.F)
+			if method == "3":
+				formula_min = get_min_F_weight(formula_ext, worlds)
+				for w in formula_min:
+					print (w.name, w.state, w.weightedF)
+
+			print(" The most best %s-worlds are: \n" % (formula))
 			for w in formula_min:
 				print (w.name, w.state, w.F)
 
@@ -371,18 +389,24 @@ while(True):
 				elif(com1 == "7"):
 					print("How would you like to evaulate the preference relationship between worlds? \n")
 					for k, v in evaluation_method.items():
+						print("The worst worlds are: \n")
 						print(k, v)
 					method = input()
 					if method == "1":
 						res = worst_worlds_by_subset(worlds)
+						print("The worst worlds are: \n")
+						for v in res.values():
+							print("%s: %s \n" % (v.name, v.F))
 					elif method == "2":
 						res = worst_worlds_by_cardinality(worlds)
+						print("The worst worlds are: \n")
+						for v in res.values():
+							print("%s: %s \n" % (v.name, v.F))
 					elif method == "3":
 						res = worst_worlds_by_weighted_cardinality(worlds)
-					print("The worst worlds are: \n")
-					res = worst_worlds_by_subset(worlds)
-					for k, v in res.items():
-						print("%s: %s \n" % (v.name, v.F))
+						print("The worst worlds are: \n")
+						for v in res.values():
+							print("%s: %s \n" % (v.name, v.weightedF))
 
 				elif(com1 == "8"):
 					print("For which rule would you like to make your query? (type in name) \n")
@@ -410,9 +434,14 @@ while(True):
 					_rule =  check_rule_input(rules)
 					print(rules[_rule].head)
 
-				elif(com == "12"):
+				elif(com1 == "12"):
 					for k, v in constraints:
 						print(v.name, v.item)
+
+
+				elif (com1 == "13"):
+					for rule in rules.values():
+						print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
 
 				else:
 					print("I'm sorry, you did not input a recognized command, please try again. \n")

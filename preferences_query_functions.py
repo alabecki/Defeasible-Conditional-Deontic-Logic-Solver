@@ -72,7 +72,7 @@ def get_world_from_state(_state, worlds):
 	result = ''
 #	print("State " + str(_state))
 	for world in worlds.values():
-		print("World " + str(world.state))
+		#print("World " + str(world.state))
 		if world.state == _state:
 	#		print("check")
 			result = world.name
@@ -149,15 +149,14 @@ def worst_worlds_by_weighted_cardinality(worlds):
 	sorted_worlds = sorted(worlds.values(), key = lambda x: x.weightedF, reverse = True)
 	most = sorted_worlds[0].weightedF
 	cont = True
-	for i in sorted_worlds:
-		print("World: %s, has F: %s \n" % (i.name, i.F))
-		if i.weightedF < most:
+	for w in sorted_worlds:
+		print("World: %s, has F: %s \n" % (w.name, w.F))
+		if w.weightedF < most:
 			print("go\n")
 			return most_violated
 		else:
 			print("Stay \n")
-			most_violated[i.name] = i
-
+			most_violated[w.name] = w
 
 
 

@@ -53,36 +53,40 @@ def construct_rules_dict(file):
 	lines = []
 	for line in file:
 		if line.startswith("("):
-			lines.append(line.strip())
 			#line.replace(" ", "")			#any line starting with a "(" is interpreted as a rule
-			#line = re.sub(r'\s+', '', line)
+			line = re.sub(r'\s+', '', line)
 			print("Print line: %s" % (line))
+			lines.append(line.strip())
 	steps = []
 	for line in lines:
-		steps.append(re.split("-> | \$", line))
+		steps.append(re.split("->|\$", line))
+			#i = re.sub(r'\s+', '', i)
 	for step in steps:
-		for i in step:
-			i = re.sub(r'\s+', '', i)
-		print(step)
-		print("%s %s " % (step[0], step[1]))
-		if len(step[0]) > 1:
-			step[0] = step[0][1:]
-		else:
-			 step[0] = " "
+		print("step: %s " % (step))
+		#print("[0], [1] %s %s " % (step[0], step[1]))
+		#if len(step[0]) > 1:
+		step[0] = step[0][1:]
+		#else:
+			#step[0] = step[0].replace("()", " ")
+			#step[0] = step[0][0:0]
+		print(len(step))
+		print (len(step[1]))
 		step[1] = step[1][:-1]
+		print("[0], [1] %s %s " % (step[0], step[1]))
 	rules = {}
 	count = 0
 	for line in steps:
-		item = line[0] + "->" + line[1]
-		print("Print item: %s \n" % (item))
 		name = "r" + str(count)
 		if len(line) == 2:
+			item = line[0] + " -> " + line[1]
 			new = Rule(name, item, line[0], line[1])
 		if len(line) == 3:
-			new = Rule(name, item, line[0], line[1], line[2])
+			print("Three...")
+			item = line[0] + " -> " + line[1] +  " " + line[2]
+			new = Rule(name, item, line[0], line[1], float(line[2]))
 		rules.update({name: new})
 		count += 1
-		return rules
+	return rules
 
 
 
@@ -174,7 +178,7 @@ def construct_worlds(propositions):
 
 def assign_extensions(formula, worlds, propositions):
 	extension = []
-	if str(formula).isspace():			#if the formula is empty it will be treated as a toutology
+	if str(formula).isspace() or len(formula) == 0:			#if the formula is empty it will be treated as a toutology
 		#print("Check Empty\n")
 		for w in worlds.values():
 			extension.append(w.state)
@@ -219,11 +223,15 @@ def domination_relations(rules):
 				#The following simply applies the definition of rule domination to the extensions of the rules in each world
 				#First check for "improper" domination
 			#print(r1.body, r2.body)
-			if (str(r1.body).isspace() and str(r2.body).isspace() ):
+			if not r1.body and not r2.body:
+				#(str(r1.body).isspace() or str(r2.body).isspace() ):
+				print("Check empty")
 				continue
-			if str(r1.body).isspace():
+			#if str(r1.body).isspace():
+			if not r1.body:
 				continue
-			elif str(r2.body).isspace():
+			elif not r2.body:
+			#str(r2.body).isspace():
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
 				temp3 = And(r1h_cnf, r2h_cnf )
@@ -232,7 +240,9 @@ def domination_relations(rules):
 					r2.dominatedBy.add(r1)
 			#	print("Check if either one has empty body")
 			else:
+				print("r2 body: %s" % (r1.body))
 				r1b_cnf = to_cnf(r1.body)
+				print("r2 body: %s" % (r2.body))
 				r2b_cnf = to_cnf(r2.body)
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
@@ -277,6 +287,7 @@ def assign_rule_violations(worlds, rules):
 			#is Neutral in this world.
 				if len(rule.dominatedBy) == 0:
 					world.F.add(k)
+					world.weightedF += rule.weight
 				else:
 					flag = False
 					for dom in rule.dominatedBy:
@@ -284,6 +295,7 @@ def assign_rule_violations(worlds, rules):
 							flag = True
 					if flag == False:
 						world.F.add(k)
+						world.weightedF += rule.weight
 
 
 def assign_rule_violations_recursive(worlds, rules, dominations):
@@ -304,7 +316,7 @@ def assign_rule_violations_recursive(worlds, rules, dominations):
 					#print("Just got back from recusion and flag is %s \n" % (flag))
 				if flag % 2 == 0:
 					world.F.add(k)
-					world.weightedF += k.weight
+					world.weightedF += rule.weight
 				else:
 					continue
 
@@ -326,7 +338,6 @@ def best_worlds_by_cardinality(worlds):
 	best_worlds = {}
 	sorted_worlds = sorted(worlds.values(), key =lambda x: len(x.F))
 	best = len(sorted_worlds[0].F)
-	cont = True
 	for i in sorted_worlds:
 		if(len(i.F) > best):
 			return best_worlds
@@ -337,8 +348,8 @@ def best_worlds_by_weighted_cardinality(worlds):
 	best_worlds = {}
 	sorted_worlds = sorted(worlds.values(), key =lambda x: x.weightedF)
 	best = sorted_worlds[0].weightedF
-	cont == True
 	for w in sorted_worlds:
+		print(w.weightedF)
 		if w.weightedF > best:
 			return best_worlds
 		else:
@@ -367,7 +378,7 @@ def reconstruct_worlds(propositions, constraints):
 	return worlds2
 
 
-def get_min_F(f_ext, worlds):
+def get_min_F_subset(f_ext, worlds):
 	f_min = set()
 	for e1 in f_ext:
 		w1 = get_world_from_state(e1, worlds)
@@ -378,6 +389,35 @@ def get_min_F(f_ext, worlds):
 				f_min.remove(worlds[w1])
 				break
 	return f_min
+
+def get_min_F_weight(f_ext, worlds):
+	f_min = set()
+	best = 99999999
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if worlds[world].weightedF < best:
+			best = worlds[world].weightedF
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if worlds[world].weightedF == best:
+			f_min.add(worlds[world])
+	return f_min
+
+def get_min_F_card(f_ext, worlds):
+	f_min = set()
+	best = 99999999
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if len(worlds[world].F) < best:
+			best = len(worlds[world].F)
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if len(worlds[world].F) == best:
+			f_min.add(worlds[world])
+	return f_min
+
+
+
 
 def obligation_implication(f1_min, f2ext, worlds):
 	Flag = True
