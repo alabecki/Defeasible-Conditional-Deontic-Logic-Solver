@@ -1,5 +1,5 @@
-(a, ~p)
-(a & b, p|c)
+(a -> ~d)
+(a & b -> d|c)
 
 # Intuitively, should imply (a & b & ~c, p), but it does not.
 
