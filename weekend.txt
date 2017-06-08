@@ -1,0 +1,15 @@
+#Weekend
+# P play ball, ~P film
+# M good mood, ~M bad mood
+# W good weather, ~W bad weather
+# R Relax, ~R Big meal
+
+
+  ( -> M)
+ ( -> W)
+(P -> R)
+(~P -> ~R)
+((M & W) -> P)
+((M & ~W) -> ~P)
+	((~M & W) -> ~P)
+((~M & ~W) -> P)
