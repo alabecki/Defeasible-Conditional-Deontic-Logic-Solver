@@ -56,6 +56,7 @@ def initiate(file):
 	dominations = set()
 	domination_relations(rules)
 	assign_rule_violations(worlds, rules)
+	assign_dependencies(worlds)
 	data = [propositions, rules, constraints, worlds]
 	return data
 
@@ -115,10 +116,10 @@ def construct_rules_dict(file):
 		#else:
 			#step[0] = step[0].replace("()", " ")
 			#step[0] = step[0][0:0]
-		print(len(step))
-		print (len(step[1]))
+		#print(len(step))
+		#print (len(step[1]))
 		step[1] = step[1][:-1]
-		print("[0], [1] %s %s " % (step[0], step[1]))
+		#print("[0], [1] %s %s " % (step[0], step[1]))
 	rules = {}
 	count = 0
 	for line in steps:
@@ -127,7 +128,6 @@ def construct_rules_dict(file):
 			item = line[0] + " -> " + line[1]
 			new = Rule(name, item, line[0], line[1])
 		if len(line) == 3:
-			print("Three...")
 			item = line[0] + " -> " + line[1] +  " $ " + line[2]
 			new = Rule(name, item, line[0], line[1], float(line[2]))
 		rules.update({name: new})
@@ -378,6 +378,13 @@ def best_worlds_by_subset(worlds):
 	return best_worlds
 
 
+def assign_dependencies(worlds):
+	for w1, world1 in worlds.items():
+		for w2, world2 in worlds.items():
+			if world1.F.issubset(world2.F) and w1 != w2:
+				world1.dependency.add(world2)
+
+
 def best_worlds_by_cardinality(worlds):
 	best_worlds = {}
 	sorted_worlds = sorted(worlds.values(), key =lambda x: len(x.F))
@@ -533,6 +540,45 @@ def implicit_rule(r, worlds, worlds2, propositions2, rules2):
 				#if (worlds[w2i].F >= worlds[w2j].F) == False:
 	print("Check out")
 	return True
+
+
+def print_worlds_by_partial_order(worlds):
+	sequence = []
+	root = best_worlds_by_subset(worlds)
+	while len(root.keys()) != 0:
+		keys = list(root.keys())
+		for k in keys:
+			if len(worlds[k].dependency) == 0:
+				new = root.pop(k)
+				sequence.append(new)
+				continue
+			min_w = min_subset(worlds[k].dependency)
+			#for d in worlds[k].dependency:
+			for w in min_w :
+				print("Min: %s" % (w.name))
+				root[w.name] = w
+			new = root.pop(k)
+			print("New %s" % (new.name))
+			print("Current Root")
+			for r, ro in root.items():
+				print(r, ro.state)
+			sequence.append(new)
+			print("Current sequence")
+			for s in sequence:
+				print(s.name)
+
+
+def min_subset(_set):
+	min_worlds = set()
+	for s1 in _set:
+		check = True
+		for s2 in _set:
+			if s2.F.issubset(s1.F) and s1.F != s2.F:
+				check = False
+		if check == True:
+			min_worlds.add(s1)
+			#best_worlds.add(w1.name)
+	return min_worlds
 
 #def implicit_rule(r, best_worlds, rules2, worlds2, propositions2):
 	#first add r as a new rule

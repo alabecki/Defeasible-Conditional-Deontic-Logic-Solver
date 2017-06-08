@@ -28,11 +28,6 @@ from preferences_core_functions import*
 from preferences_query_functions import*
 from preference_classes import*
 
-evaluation_method = {
-	"1": "By subset relationships in terms of rule violation \n",
-	"2": "In terms of the cadinality of rule violations \n",
-	"3": "In terms of the weighted cardinality of rule violations \n"
-}
 
 
 commands = {
@@ -64,7 +59,21 @@ debugging = {
 	"9": "Print body of a rule",
 	"10": "Print head of a rule",
 	"11": "Show constraints",
-	"12": "Show weights of rules"
+	"12": "Show weights of rules",
+	"13": "Show dependencies of each world"
+}
+
+
+evaluation_method = {
+	"1": "By subset relationships in terms of rule violation \n",
+	"2": "In terms of the cadinality of rule violations \n",
+	"3": "In terms of the weighted cardinality of rule violations \n"
+}
+
+
+save_options = {
+	"1": "Save text showing essential data: rule set, constraints, list of worlds with the rules they violate in order of cardinal preference",
+
 }
 
 #Main_____________________________________________________________________________________________________________________
@@ -160,16 +169,20 @@ while(True):
 			if method == "3":
 				compare_worlds_by_weighted_cardinality(pair[0], pair[1], worlds)
 
-		elif(com == "4"):
-			print("The worlds ordered by cardinality of rule violation: \n")
-			print_worlds_by_cardinality(worlds)
-		#	for world in worlds.values():
-			#	print("%s %s: %s , %s\n" % (world.name, world.state, world.F, world.weightedF))
-
-		elif(com == "5"):
-			print("The worlds ordered by weighted cardinality of rule violation \n")
-			print_worlds_by_weighed_cardinality(worlds)
-
+		elif com == "4":
+			print("How would you like to evaulate the preference relationship between worlds? \n")
+			for k, v in evaluation_method.items():
+				print(k, v)
+			method = input()
+			if method == "1":
+				print("The worlds ordered to partial subset order \n")
+				print_worlds_by_partial_order(worlds)
+			elif method == "2":
+				print("The worlds ordered by cardinality of rule violation: \n")
+				print_worlds_by_cardinality(worlds)
+			elif method == "3":
+				print("The worlds ordered by weighted cardinality of rule violation \n")
+				print_worlds_by_weighed_cardinality(worlds)
 
 
 		elif(com == "6"):
@@ -509,6 +522,12 @@ while(True):
 				elif (com1 == "12"):
 					for rule in rules.values():
 						print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
+
+				elif (com1 == "13"):
+					for w, world in worlds.items():
+						print("World: %s \n" %  (world.name))
+						for d in world.dependency:
+							print(d.name, end=' ')
 
 				else:
 					print("I'm sorry, you did not input a recognized command, please try again. \n")

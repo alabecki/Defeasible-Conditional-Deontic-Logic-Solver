@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from preference_classes import*
-from preferences_query_functions import*
+from preferences_core_functions import*
 
 #Since the F attribute of worlds is a set (the set of rules violated by a world) we can compare different worlds through
 #set operations with respect to F
