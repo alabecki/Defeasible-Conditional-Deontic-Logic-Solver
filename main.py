@@ -1,17 +1,8 @@
 #
-#		Naive Preferences Solver_____________________________________________________________________________________________________________________________
-#
-#	The program reads txt files composed of rules in the following format:
-#		(b, h), where a and b are formulas of propositional logic
-#		b is the "body" of the rule, while h is the "head"
-#		"&" is used for "and", "|" is used for "or", and "~" is used for negation
-#		Example: ( (~P | (~Q | R)), (Q & P) )
-#
-#		The program makes use of the SAT solver included in sympy, which requires mpath
-#		It also utilizes the Symbol object, with which formulas are encoded for the purpose of using the SAT solver
-#
-#
-#		Import Libraries_____________________________________________________________________________________________________________________________________
+#Naive Preferences Solver _________________________________________________________________________________________________
+
+
+ #Libraries______________________________________________________________________________________________________________________
 from sympy import Symbol
 from sympy.abc import*
 from sympy.logic.boolalg import to_cnf
@@ -65,15 +56,15 @@ debugging = {
 
 
 evaluation_method = {
-	"1": "By subset relationships in terms of rule violation \n",
-	"2": "In terms of the cadinality of rule violations \n",
-	"3": "In terms of the weighted cardinality of rule violations \n"
+	"1": "By subset relationships in terms of rule violation ",
+	"2": "In terms of the cadinality of rule violations ",
+	"3": "In terms of the weighted cardinality of rule violations"
 }
 
 
 save_options = {
 	"1": "Save text showing essential data: rule set, constraints, list of worlds with the rules they violate in order of cardinal preference",
-
+	"2": "Save text showing essential data: rule set, constraints, list of worlds with the rules they violate in order of weighted cardinal preference"
 }
 
 #Main_____________________________________________________________________________________________________________________
@@ -121,22 +112,34 @@ while(True):
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 			if method == "1":
 				best_worlds = best_worlds_by_subset(worlds)
-			if method == "2":
+				print("The most preferred worlds ordered by subsets of violations:")
+				for k, v in best_worlds.items():
+					print("%s: %s \n" % (k, v.state))
+			elif method == "2":
 				best_worlds = best_worlds_by_cardinality(worlds)
-			if method == "3":
+				print("The most preferred worlds ordered by number of violated rules:")
+				for k, v in best_worlds.items():
+					print("%s: %s \n" % (k, v.state))
+			elif method == "3":
 				best_worlds = best_worlds_by_weighted_cardinality(worlds)
-			print(" The most preferred worlds are: \n")
-			for k, v in best_worlds.items():
-				print("%s: %s \n" % (k, v.state))
+				print(" The most preferred worlds by weighted rule violations: \n")
+				for k, v in best_worlds.items():
+					print("%s: %s \n" % (k, v.state))
+			else:
+				print("That was not one of the avilable selections, please try again \n")
 		elif(com == "2"):
 			print("How would you like to evaulate the preference relationship between worlds? \n")
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 			if method == "1":
 				res = worst_worlds_by_subset(worlds)
 				print("The worst worlds are: \n")
@@ -156,7 +159,9 @@ while(True):
 			print("How would you like to evaulate the preference relationship between worlds? \n")
 			for k, v in evaluation_method.items():
 				print(k, v)
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 			print("Which two worlds would you like to compare? \n")
 			for world in worlds.values():
 				print("%s: %s \n" % (world.name, world.state))
@@ -170,20 +175,12 @@ while(True):
 				compare_worlds_by_weighted_cardinality(pair[0], pair[1], worlds)
 
 		elif com == "4":
-			print("How would you like to evaulate the preference relationship between worlds? \n")
-			for k, v in evaluation_method.items():
-				print(k, v)
-			method = input()
-			if method == "1":
-				print("The worlds ordered to partial subset order \n")
-				print_worlds_by_partial_order(worlds)
-			elif method == "2":
-				print("The worlds ordered by cardinality of rule violation: \n")
-				print_worlds_by_cardinality(worlds)
-			elif method == "3":
+			print("The worlds ordered by cardinality of rule violation: \n")
+			print_worlds_by_cardinality(worlds)
+
+		elif com == "5":
 				print("The worlds ordered by weighted cardinality of rule violation \n")
 				print_worlds_by_weighed_cardinality(worlds)
-
 
 		elif(com == "6"):
 			formula = input("Please write a formula to check \n")
@@ -192,7 +189,9 @@ while(True):
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 			if method == "1":
 				formula_min = get_min_F_subset(formula_ext, worlds)
 				print(" The best %s-worlds are: \n" % (formula))
@@ -212,7 +211,6 @@ while(True):
 					print (w.name, w.state, w.weightedF)
 				print("\n")
 
-
 		elif(com == "7"):
 			p = input("Please enter the first formula using &, ~, and | as operators \n")
 			q = input("Please enter the second fomula using &, ~, and | as operators \n")
@@ -224,7 +222,9 @@ while(True):
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 
 			if len(propositions2) == current_num_proposition:
 				p_ext = assign_extensions(p, worlds, propositions)
@@ -274,7 +274,9 @@ while(True):
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
-			method = input()
+			method = "0"
+			while method != "1" and method != "2" and methid != "3"
+				method = input()
 
 			if len(propositions2) == current_num_proposition:
 				p_ext = assign_extensions(p, worlds, propositions)
@@ -359,42 +361,20 @@ while(True):
 			delete_file_content(combined_file)
 			file.seek(0)
 			for line in file:
-				print("What the fuck is your problem?")
 				buf = line
-				print("Print buf: %s \n" % (buf))
 				combined_file.write("%s\n" % (buf))
 			_new_file = get_file()
 			new_file = _new_file[0]
 			new_file_name = _new_file[1]
 			for line in new_file:
 				buf = line
-				print("Print buf: %s \n" % (buf))
 				combined_file.write("%s\n" % (buf))
 			combined_file.close()
 			combined_file = open("temp2.txt", 'r+')
-			print("Combined File")
 			for line in combined_file:
 				print(line)
 			combined_file.seek(0)
 
-			#filenames = [  temp + '.tx',  new_file + '.txt', ...]
-			#with open('path/to/output/file', 'w') as outfile:
-    		#for fname in filenames:
-        		#with open(fname) as infile:
-            	#outfile.write(infile.read())
-
-
-			#for v in rules.values():
-				#new_line = v.item
-
-			#	new_file.write("%s\n" % (new_line))
-				#new_file.writelines(new_line)
-			#for line in new_file:
-				#print (line)
-		#	for c in constraints.values():
-			#	new_line = "!" + c.item
-				#new_file.writeline("%s\n" % (new_line))
-			#new_file.seek(0)
 			data = initiate(combined_file)
 
 			propositions = data[0]
@@ -402,18 +382,6 @@ while(True):
 			constraints = data[2]
 			worlds = data[3]
 
-			#new_propositions = obtain_atomic_formulas(new_file)
-			#propositions = propositions | new_propositions
-			#new_file.seek(0)
-			#add_rules_from_file(new_file, rules)
-			#new_file.seek(0)
-			#add_constraints_from_file(new_file, constraints)
-			#worlds = reconstruct_worlds(propositions,constraints)
-			#for k, rule in rules.items():
-			#	rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
-			#	rule.headExtension = assign_extensions(rule.head, worlds, propositions)
-			#domination_relations(rules)
-			#assign_rule_violations(worlds, rules)
 			print("The new rules have been merged with the old ones \n")
 
 		elif(com == "12"):
@@ -487,13 +455,13 @@ while(True):
 							for dom in rule.dominatedBy:
 								print(dom.name)
 
-
 				elif(com1 == "7"):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
 						print("%s: %s \n" % (k, rule.item))
 					_rule =  check_rule_input(rules)
 					print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
+
 				elif(com1 == "8"):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
@@ -532,7 +500,61 @@ while(True):
 				else:
 					print("I'm sorry, you did not input a recognized command, please try again. \n")
 		elif(com == "13"):
-			print("")
+			text_name = input("Please provide a name for the text file (not including file extension)... \n")
+			text_name = text_name + ".txt"
+			save = open(text_name, 'a+')
+			save.write("Defeasable Conditional Deontic Logic Results\n")
+			save.write("\n")
+			save.write("Rules: \n")
+			for r, rule in rules.items():
+				line = r + " " + rule.item
+				save.write("%s\n" % (line))
+			save.write("\n")
+			save.write("Constraints: \n")
+			for c, con in constraints.items():
+				save.write("%s\n" % (con))
+			save.write("\n")
+
+			print("Please select one of the following:\n")
+			for k, v in save_options.items():
+				print (k, v)
+
+			selection = input()
+			if selection == "1":
+				sorted_worlds = sorted(worlds.values(), key =lambda x: len(x.F))
+				for i in sorted_worlds:
+					save.write("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
+			if selection == "2":
+				sorted_worlds = sorted(worlds.values(), key =lambda x: x.weightedF)
+				for i in sorted_worlds:
+					save.write("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
+				save.write("%s \n" % ("\n"))
+
+			while  True:
+				more = input("Would you like to agument your file with the best f worlds, for some formula f? (y/n)\n")
+				if more == "n":
+					save.close()
+					break
+				if more == "y":
+					formula = input("Please write a formula to check \n")
+					formula_ext = assign_extensions(formula, worlds, propositions)
+					save.write("The best %s-worlds: \n" % (formula))
+					print("How would you like to evaulate the preference relationship between worlds? \n")
+					for k, v in evaluation_method.items():
+						print(k, v)
+					print("\n")
+					method = input()
+					if method == "1":
+						formula_min = get_min_F_subset(formula_ext, worlds)
+					if method == "2":
+						formula_min = get_min_F_card(formula_ext, worlds)
+					if method == "3":
+						formula_min = get_min_F_weight(formula_ext, worlds)
+					for w in formula_min:
+						save.write("%s: %s, %s \n" % (w.name, w.state, w.F))
+					save.write("%s \n" % ("\n"))
+				else:
+					print("Please input either 'y' or 'n' \n")
 
 		elif(com == "14"):
 			file.close()

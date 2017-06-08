@@ -2,7 +2,7 @@
 # One class is used to store attributes of rules and one class is used to sture attributes of worlds (states).
 
 class Rule(object):
-	def __init__(self, _name, _item, _body, _head, _weight = 0):
+	def __init__(self, _name, _item, _body, _head, _weight = 1):
 		self.name = _name							# Name of rule for purpose of retrieval (r1, r2, ...)
 		self.item = _item							# Item is the actual rule itself
 		self.body = _body							# The body of the rule

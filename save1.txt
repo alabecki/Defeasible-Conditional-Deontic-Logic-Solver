@@ -1,0 +1,34 @@
+
+Defeasable Conditional Deontic Logic Results
+Rules: 
+r0 (A&~B) -> (C|~A)
+r1 (~A|C) -> (B&(A|~C))
+r2 (A&B) -> C
+r3 A -> ~C
+r4 (D&(C|B)) -> (~A|~B)
+r5 (~D|(A&C)) -> C
+
+Constraints: 
+
+w10: {B: True, A: False, D: True, C: False}, set(), 0.0 
+w13: {B: True, A: True, D: False, C: True}, set(), 0.0 
+w1: {B: False, A: False, D: False, C: True}, {'r1'}, 1.0 
+w2: {B: False, A: False, D: True, C: False}, {'r1'}, 1.0 
+w3: {B: False, A: False, D: True, C: True}, {'r1'}, 1.0 
+w6: {B: False, A: True, D: True, C: False}, {'r0'}, 1.0 
+w8: {B: True, A: False, D: False, C: False}, {'r5'}, 1.0 
+w9: {B: True, A: False, D: False, C: True}, {'r1'}, 1.0 
+w11: {B: True, A: False, D: True, C: True}, {'r1'}, 1.0 
+w15: {B: True, A: True, D: True, C: True}, {'r4'}, 1.0 
+w0: {B: False, A: False, D: False, C: False}, {'r5', 'r1'}, 2.0 
+w4: {B: False, A: True, D: False, C: False}, {'r0', 'r5'}, 2.0 
+w5: {B: False, A: True, D: False, C: True}, {'r3', 'r1'}, 2.0 
+w7: {B: False, A: True, D: True, C: True}, {'r3', 'r1'}, 2.0 
+w12: {B: True, A: True, D: False, C: False}, {'r2', 'r5'}, 2.0 
+w14: {B: True, A: True, D: True, C: False}, {'r2', 'r4'}, 2.0 
+The best A & ~B-worlds: 
+w7: {B: False, A: True, D: True, C: True}, {'r3', 'r1'} 
+w5: {B: False, A: True, D: False, C: True}, {'r3', 'r1'} 
+w6: {B: False, A: True, D: True, C: False}, {'r0'} 
+
+ 
