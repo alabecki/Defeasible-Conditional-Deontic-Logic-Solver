@@ -30,7 +30,7 @@ commands = {
 	"6": "Show the best worlds at which a formula f is true",
 	"7": "Determine whether, given R, the truth of 'a' makes 'b' obligatory (user povides a and b)",
 	"8": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
-	"9": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a, b))",
+	"9": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a -> b))",
 	"10": "Add rule to R",
 	"11": "Augment current rules with rules from an additional file",
 	"12": "Additional Queries",
@@ -113,7 +113,7 @@ while(True):
 				print(k, v)
 			print("\n")
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 			if method == "1":
 				best_worlds = best_worlds_by_subset(worlds)
@@ -138,7 +138,7 @@ while(True):
 				print(k, v)
 			print("\n")
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 			if method == "1":
 				res = worst_worlds_by_subset(worlds)
@@ -160,7 +160,7 @@ while(True):
 			for k, v in evaluation_method.items():
 				print(k, v)
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 			print("Which two worlds would you like to compare? \n")
 			for world in worlds.values():
@@ -190,7 +190,7 @@ while(True):
 				print(k, v)
 			print("\n")
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 			if method == "1":
 				formula_min = get_min_F_subset(formula_ext, worlds)
@@ -223,7 +223,7 @@ while(True):
 				print(k, v)
 			print("\n")
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 
 			if len(propositions2) == current_num_proposition:
@@ -275,7 +275,7 @@ while(True):
 				print(k, v)
 			print("\n")
 			method = "0"
-			while method != "1" and method != "2" and methid != "3"
+			while method != "1" and method != "2" and method != "3":
 				method = input()
 
 			if len(propositions2) == current_num_proposition:
@@ -356,7 +356,6 @@ while(True):
 
 		elif(com == "11"):
 			#copyfile("filename", "temp.txt")
-
 			combined_file = open("temp2.txt", 'a+')
 			delete_file_content(combined_file)
 			file.seek(0)
@@ -371,8 +370,7 @@ while(True):
 				combined_file.write("%s\n" % (buf))
 			combined_file.close()
 			combined_file = open("temp2.txt", 'r+')
-			for line in combined_file:
-				print(line)
+			
 			combined_file.seek(0)
 
 			data = initiate(combined_file)

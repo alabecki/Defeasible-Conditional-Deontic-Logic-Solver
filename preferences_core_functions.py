@@ -22,8 +22,7 @@ def initiate(file):
 	file.seek(0)
 	file.seek(0)
 	propositions = obtain_atomic_formulas(file)
-	for p in propositions:
-		print (p)
+
 	file.seek(0)
 	rules = construct_rules_dict(file)		#parces input text, make a Rule object for each rule, saves objects in dictionary
 	file.seek(0)
@@ -88,35 +87,24 @@ def obtain_atomic_formulas(file):
 
 
 
-def delete_file_content(pfile):
-    pfile.seek(0)
-    pfile.truncate()
+def delete_file_content(file):
+    file.seek(0)
+    file.truncate()
 # Parses each line of the rule file to create a a dictionary of rules, distinguishing the item, body and head. The key is the name of the rule
 # while the value is the Rule object itself
 def construct_rules_dict(file):
 	lines = []
 	for line in file:
 		if line.startswith("("):
-			#line.replace(" ", "")			#any line starting with a "(" is interpreted as a rule
 			line = re.sub(r'\s+', '', line)
-		#	print("Print line: %s" % (line))
 			lines.append(line.strip())
 	steps = []
 	for line in lines:
 		steps.append(re.split("->|\$", line))
-			#i = re.sub(r'\s+', '', i)
 	for step in steps:
-	#	print("step: %s " % (step))
-		#print("[0], [1] %s %s " % (step[0], step[1]))
-		#if len(step[0]) > 1:
 		step[0] = step[0][1:]
-		#else:
-			#step[0] = step[0].replace("()", " ")
-			#step[0] = step[0][0:0]
-		#print(len(step))
-		#print (len(step[1]))
+		
 		step[1] = step[1][:-1]
-		#print("[0], [1] %s %s " % (step[0], step[1]))
 	rules = {}
 	count = 0
 	for line in steps:
@@ -136,29 +124,47 @@ def construct_rules_dict(file):
 def add_rules_from_file(file, rules):
 	lines = []
 	for line in file:
-		if line.startswith("("):				#any line starting with a "(" is interpreted as a rule
+		if line.startswith("("):
+			line = re.sub(r'\s+', '', line)
 			lines.append(line.strip())
-	temp1 = [line[1:] for line in lines]		#remove "(" at the beginning of the rule
-	temp2 = [line[:-1] for line in temp1]		#remove the ")" at the end of the rule
-	temp3 = [line.split("->") for line in temp2]
-	count = len(rules.keys())										#used to assign each rule with a unique name
-	for line in temp3:
-		item = line[0] + "->" + line[1]				#stores the original rule
-		name = "r" + str(count)						#gives each rule a unique name "r" plus an integer
-		new = Rule(name, item, line[0], line[1])	#creates a new Rule object there line[0] and line[1] are the body and head
-		rules.update({name: new})					#adds the new rule to the dictionary of rules
+	steps = []
+	for line in lines:
+		steps.append(re.split("->|\$", line))
+	for step in steps:
+		step[0] = step[0][1:]
+		
+		step[1] = step[1][:-1]
+	count = 0
+	for line in steps:
+		name = "r" + str(count)
+		if len(line) == 2:
+			item = line[0] + " -> " + line[1]
+			new = Rule(name, item, line[0], line[1])
+		if len(line) == 3:
+			item = line[0] + " -> " + line[1] +  " $ " + line[2]
+			new = Rule(name, item, line[0], line[1], float(line[2]))
+		rules.update({name: new})
 		count += 1
 
 
+
+
 def add_rule(rule, rules):
+	rule = re.sub(r'\s+', '', rule)
+	step = (re.split("->|\$", rule))
+	step[0] = step[0][1:]
+	step[1] = step[1][:-1]
 	count = len(rules)
-	temp1 = rule[1:]
-	temp2 = temp1[:-1]
-	temp3 = temp2.split("->")
-	#print("New body: %s, new head: %s \n" % (temp3[0], temp3[1]))
-	item = temp3[0] + "->" + temp3[1]
 	name = "r" + str(count)
-	new = Rule(name, item, temp3[0], temp3[1])
+	if len(step) == 1: 
+		item = " " + " -> " + step[0]
+		new = Rule(name, item, " " , step[0])
+	if len(step) == 2:
+		item = step[0] + " -> " + step[1]
+		new = Rule(name, item, step[0], step[1])
+	if len(step) == 3:
+		item = step[0] + " -> " + step[1] +  " $ " + step[2]
+		new = Rule(name, item, step[0], step[1], float(step[2]))
 	rules.update({name: new})
 
 
@@ -279,10 +285,9 @@ def domination_relations(rules):
 				notbothheads = Not(temp3)
 				if valid(notbothheads) == True:
 					r2.dominatedBy.add(r1)
-			#	print("Check if either one has empty body")
 			else:
 				r1b_cnf = to_cnf(r1.body)
-			#	print(r2.body)
+				#print(r2.body)
 				r2b_cnf = to_cnf(r2.body)
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
