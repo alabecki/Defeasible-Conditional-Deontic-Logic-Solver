@@ -20,39 +20,29 @@ from copy import deepcopy
 #Prompts user to enter the name if a file, if the file does not exist, it reiterates.
 def initiate(file):
 	file.seek(0)
-	file.seek(0)
 	propositions = obtain_atomic_formulas(file)
-
+	for p in propositions:					#fetches all atomic formulas found in a rule or constraint
+		print (p)
 	file.seek(0)
-	rules = construct_rules_dict(file)		#parces input text, make a Rule object for each rule, saves objects in dictionary
+	rules = construct_rules_dict(file)		# parses input text, make a Rule object for each rule, saves objects in dictionary
 	file.seek(0)
-	constraints = add_constraints(file)		#parces and saves contraints in a dictionary
+	constraints = add_constraints(file)		#parses parces and saves contraints in a dictionary
 	for k, v in rules.items():
 		print(k, v.item)
-	_worlds = construct_worlds(propositions)
+	_worlds = construct_worlds(propositions)  #creates a dictionary of worlds
 	for k, v in constraints.items():
 		print(k, v.item)
-	for k, constraint in constraints.items():
-		constraint.extension = assign_extensions(constraint.item, _worlds, propositions)
-	worlds = {}
-	flag = True
-	for w, world in _worlds.items():
-		flag = True
-		for constraint in constraints.values():
-			if world.state not in constraint.extension:
-				flag = False
-		if flag == True:
-			worlds[w] = world
+	worlds = reconstruct_worlds(propositions, constraints) #Next, exclude worlds that are prohibited by the constriants
 	print("Worlds after constraints: \n")
 	for w in worlds.values():
 		print(w.state)
 	for k, rule in rules.items():
-		rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
-		rule.headExtension = assign_extensions(rule.head, worlds, propositions)
-	dominations = set()
-	domination_relations(rules)
-	assign_rule_violations(worlds, rules)
-	assign_dependencies(worlds)
+		rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)		#obtains extension of bodies of rules
+		rule.headExtension = assign_extensions(rule.head, worlds, propositions)		#obtains extensions of heads of rules
+	domination_relations(rules)									#assigns each rule the set of rules that dominate it
+	assign_rule_violations(worlds, rules)						#Assigns a set of rule violations to each world
+	#assign_rule_violations_recursive(worlds, rules)
+	#assign_dependencies(worlds)									#(Not currently used - might use later for printing partial ordering)
 	data = [propositions, rules, constraints, worlds]
 	return data
 
@@ -86,11 +76,11 @@ def obtain_atomic_formulas(file):
 	return propositions						#returns the set of propositions involved in the set of rules
 
 
+def delete_file_content(pfile):
+    pfile.seek(0)
+    pfile.truncate()
 
-def delete_file_content(file):
-    file.seek(0)
-    file.truncate()
-# Parses each line of the rule file to create a a dictionary of rules, distinguishing the item, body and head. The key is the name of the rule
+# Parses each line of the rule file to create a dictionary of rules, distinguishing the item, body and head. The key is the name of the rule
 # while the value is the Rule object itself
 def construct_rules_dict(file):
 	lines = []
@@ -103,7 +93,7 @@ def construct_rules_dict(file):
 		steps.append(re.split("->|\$", line))
 	for step in steps:
 		step[0] = step[0][1:]
-		
+
 		step[1] = step[1][:-1]
 	rules = {}
 	count = 0
@@ -119,8 +109,6 @@ def construct_rules_dict(file):
 		count += 1
 	return rules
 
-
-
 def add_rules_from_file(file, rules):
 	lines = []
 	for line in file:
@@ -132,7 +120,7 @@ def add_rules_from_file(file, rules):
 		steps.append(re.split("->|\$", line))
 	for step in steps:
 		step[0] = step[0][1:]
-		
+
 		step[1] = step[1][:-1]
 	count = 0
 	for line in steps:
@@ -146,9 +134,6 @@ def add_rules_from_file(file, rules):
 		rules.update({name: new})
 		count += 1
 
-
-
-
 def add_rule(rule, rules):
 	rule = re.sub(r'\s+', '', rule)
 	step = (re.split("->|\$", rule))
@@ -156,7 +141,7 @@ def add_rule(rule, rules):
 	step[1] = step[1][:-1]
 	count = len(rules)
 	name = "r" + str(count)
-	if len(step) == 1: 
+	if len(step) == 1:
 		item = " " + " -> " + step[0]
 		new = Rule(name, item, " " , step[0])
 	if len(step) == 2:
@@ -171,6 +156,8 @@ def add_rule(rule, rules):
 def add_constraints(file):
 	lines = []
 	for line in file:
+		line.lstrip()
+		line = re.sub(r'\s+', '', line)
 		if line.startswith("!"):
 			lines.append(line.strip())
 		#for line in lines:
@@ -179,7 +166,6 @@ def add_constraints(file):
 	constraints = {}
 	count = 0
 	for line in temp1:
-		#print(temp1)
 		name = "c" + str(count)
 		new = Constraint(name, line)
 		constraints.update({name: new})
@@ -189,6 +175,8 @@ def add_constraints(file):
 def add_constraints_from_file(file, constraints):
 	lines = []
 	for line in file:
+		line.lstrip()
+		line = re.sub(r'\s+', '', line)
 		if line.startswith("!"):
 			lines.append(line.strip())
 	temp1 = [line[1:] for line in lines]		#remove "!(" at the beginning of the rule
@@ -205,6 +193,14 @@ def add_constraints_from_file(file, constraints):
 # Uses the output of obtain_atomic_formulas first create a table of Boolean values corresponding to a world. It then constructs its "state" as a dictionary
 # where the keys are propositions and the values are Booleans. The names and states are passed on as arguments to create a list of World objects.
 def construct_worlds(propositions):
+	_op = []
+	for p in propositions:
+		_op.append(str(p))
+	_op.sort()
+	op = []
+	for o in _op:
+		new = Symbol(o)
+		op.append(new)
 	num_worlds = list(range(2**len(propositions)))	#calculates number of rows in the table from which the worlds will be obtained
 	world_names = ["w" + str(i) for i in num_worlds]	#creates a unique name for each world: "w" plus an integer
 	n = len(propositions)								#number of propositions for table creation
@@ -212,7 +208,7 @@ def construct_worlds(propositions):
 	worlds = {}											#initiates an empty list of worlds
 	count = 0
 	for row in table:
-		state = dict(zip(propositions, row))
+		state = dict(zip(op, row))
 		name = world_names[count]			#each state is a dictionary associating a truth value with each propositional
 		new = World(name, state)			#new world object is created with the name and state as attributes
 		worlds[name] = new								#the new world is added to the list of worlds
@@ -220,10 +216,7 @@ def construct_worlds(propositions):
 	return worlds
 
 # Assigns each rule head and rule body a set of possible worlds, namely those in which it is true
-#Since a given rule body/head will typically not include all atomic propositions found within the rule-set, directly applying  a
-# SAT solver on this formulas will not give us the worlds we are looking for, since each world should assign truth values to all
-# propositions found in the rule-set. So given a body/head x, if P is a proposition found in the set of rules but not in x, then x will be
-#augmented with &(P | ~P).
+#Since a given rule body/head will typically not include all atomic propositions found within the rule-set, directly applying  #a SAT solver on this formula will not give us the worlds we are looking for, since each world should assign truth values to  #all propositions found in the rule-set. So given a body/head x, if P is a proposition found in the set of rules but not in x, #then x will be augmented with &(P | ~P).
 
 def assign_extensions(formula, worlds, propositions):
 	extension = []
@@ -285,9 +278,10 @@ def domination_relations(rules):
 				notbothheads = Not(temp3)
 				if valid(notbothheads) == True:
 					r2.dominatedBy.add(r1)
+			#	print("Check if either one has empty body")
 			else:
 				r1b_cnf = to_cnf(r1.body)
-				#print(r2.body)
+			#	print(r2.body)
 				r2b_cnf = to_cnf(r2.body)
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
@@ -343,7 +337,7 @@ def assign_rule_violations(worlds, rules):
 						world.weightedF += rule.weight
 
 
-def assign_rule_violations_recursive(worlds, rules, dominations):
+def assign_rule_violations_recursive(worlds, rules):
 	print("Assigning rule violations ________________________________________________________________________________")
 	for world in worlds.values():
 		for k, rule in rules.items():

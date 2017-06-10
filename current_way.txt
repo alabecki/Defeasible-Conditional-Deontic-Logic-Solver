@@ -1,0 +1,60 @@
+Defeasable Conditional Deontic Logic Results
+
+Rules: 
+r0  -> b
+r1 ((a|~c)|d) -> ~b
+r2 a|~c -> b
+r3 a -> ~b
+r4 (a&~c) -> b
+r5 (a&~c&d) -> ~b
+r6 a&~a -> b
+
+Constraints: 
+
+Sorted worlds with their rule violations: 
+w3: {c: False, b: False, d: True, a: True}, set(), 0.0 
+w4: {c: False, b: True, d: False, a: False}, set(), 0.0 
+w5: {c: False, b: True, d: False, a: True}, set(), 0.0 
+w6: {c: False, b: True, d: True, a: False}, set(), 0.0 
+w9: {c: True, b: False, d: False, a: True}, set(), 0.0 
+w10: {c: True, b: False, d: True, a: False}, set(), 0.0 
+w11: {c: True, b: False, d: True, a: True}, set(), 0.0 
+w12: {c: True, b: True, d: False, a: False}, set(), 0.0 
+w0: {c: False, b: False, d: False, a: False}, {'r2'}, 1.0 
+w1: {c: False, b: False, d: False, a: True}, {'r4'}, 1.0 
+w2: {c: False, b: False, d: True, a: False}, {'r2'}, 1.0 
+w7: {c: False, b: True, d: True, a: True}, {'r5'}, 1.0 
+w8: {c: True, b: False, d: False, a: False}, {'r0'}, 1.0 
+w13: {c: True, b: True, d: False, a: True}, {'r3'}, 1.0 
+w14: {c: True, b: True, d: True, a: False}, {'r1'}, 1.0 
+w15: {c: True, b: True, d: True, a: True}, {'r3'}, 1.0 
+Defeasable Conditional Deontic Logic Results
+
+Rules: 
+r0  -> b
+r1 ((a|~c)|d) -> ~b
+r2 a|~c -> b
+r3 a -> ~b
+r4 (a&~c) -> b
+r5 (a&~c&d) -> ~b
+r6 a&~a -> b
+
+Constraints: 
+
+Sorted worlds with their rule violations: 
+w3: {a: False, b: False, c: True, d: True}, set(), 0.0 
+w4: {a: False, b: True, c: False, d: False}, set(), 0.0 
+w5: {a: False, b: True, c: False, d: True}, set(), 0.0 
+w6: {a: False, b: True, c: True, d: False}, set(), 0.0 
+w9: {a: True, b: False, c: False, d: True}, set(), 0.0 
+w10: {a: True, b: False, c: True, d: False}, set(), 0.0 
+w11: {a: True, b: False, c: True, d: True}, set(), 0.0 
+w12: {a: True, b: True, c: False, d: False}, set(), 0.0 
+w0: {a: False, b: False, c: False, d: False}, {'r2'}, 1.0 
+w1: {a: False, b: False, c: False, d: True}, {'r2'}, 1.0 
+w2: {a: False, b: False, c: True, d: False}, {'r0'}, 1.0 
+w7: {a: False, b: True, c: True, d: True}, {'r1'}, 1.0 
+w8: {a: True, b: False, c: False, d: False}, {'r4'}, 1.0 
+w13: {a: True, b: True, c: False, d: True}, {'r5'}, 1.0 
+w14: {a: True, b: True, c: True, d: False}, {'r3'}, 1.0 
+w15: {a: True, b: True, c: True, d: True}, {'r3'}, 1.0 

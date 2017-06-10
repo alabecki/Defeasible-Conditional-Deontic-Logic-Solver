@@ -24,13 +24,13 @@ from preference_classes import*
 commands = {
 	"1": "Show the set of most preferable  worlds",
 	"2": "Show the set of least preferable worlds",
-	"3": "Compare two specific worlds with resepect to preference",
+	"3": "Compare two specific worlds with respect to preference",
 	"4": "Show which rules are violated at each world ordered by number of rule violations",
 	"5": "Show which rules are violated at each world ordered by weighted number of rule violations",
 	"6": "Show the best worlds at which a formula f is true",
-	"7": "Determine whether, given R, the truth of 'a' makes 'b' obligatory (user povides a and b)",
+	"7": "Determine whether, given R, the truth of 'a' makes 'b' obligatory (user provides a and b)",
 	"8": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
-	"9": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a -> b))",
+	"9": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a, b))",
 	"10": "Add rule to R",
 	"11": "Augment current rules with rules from an additional file",
 	"12": "Additional Queries",
@@ -42,7 +42,7 @@ debugging = {
 	"1": "Show the world states at which a given rule is true",
 	"2": "Show the world states at which a given rule is violated",
 	"3": "Show which rules are false at a given world",
-	"4": "Show which rules are verified  at a given world",
+	"4": "Show which rules are verified at a given world",
 	"5": "Show which rules are neutral relative to a given world",
 	"6": "Show the set of domination relations between rules",
 	"7": "Show the body extension of a rule",
@@ -57,7 +57,7 @@ debugging = {
 
 evaluation_method = {
 	"1": "By subset relationships in terms of rule violation ",
-	"2": "In terms of the cadinality of rule violations ",
+	"2": "In terms of the cardinality  of rule violations ",
 	"3": "In terms of the weighted cardinality of rule violations"
 }
 
@@ -90,6 +90,8 @@ while(True):
 
 	print("Processing rules____________________________________________________________ \n")
 
+	files = []
+	files.append(file)
 	data = initiate(file)
 
 	propositions = data[0]
@@ -213,12 +215,12 @@ while(True):
 
 		elif(com == "7"):
 			p = input("Please enter the first formula using &, ~, and | as operators \n")
-			q = input("Please enter the second fomula using &, ~, and | as operators \n")
+			q = input("Please enter the second formula using &, ~, and | as operators \n")
 			current_num_proposition = len(propositions)
 			propositions2 = deepcopy(propositions)
 			add_proposition(propositions2, p)
 			add_proposition(propositions2, q)
-			print("How would you like to evaulate the preference relationship between worlds? \n")
+			print("How would you like to evaluate  the preference relationship between worlds? \n")
 			for k, v in evaluation_method.items():
 				print(k, v)
 			print("\n")
@@ -237,7 +239,7 @@ while(True):
 				q_ext = assign_extensions(q, worlds, propositions)
 				b = obligation_implication(p_min, q_ext, worlds)
 				if b == True:
-					print("Given our preferences, %s obgliates %s \n" % (p, q))
+					print("Given our preferences, %s obligates  %s \n" % (p, q))
 				if b == False:
 					print("Given our preferences, %s does not obligate %s \n" % (p, q))
 
@@ -259,13 +261,13 @@ while(True):
 				q_ext = assign_extensions(q, worlds_extended, propositions2)
 				b = obligation_implication(p_min, q_ext, worlds_extended)
 				if b == True:
-					print("Given our preferences, %s obgliates %s \n" % (p, q))
+					print("Given our preferences, %s obligates  %s \n" % (p, q))
 				if b == False:
 					print("Given our preferences, %s does not obligate %s \n" % (p, q))
 
 		elif(com == "8"):
 			p = input("Please enter the first formula using &, ~, and | as operators \n")
-			q = input("Please enter the second fomula using &, ~, and | as operators \n")
+			q = input("Please enter the second formula using &, ~, and | as operators \n")
 			current_num_proposition = len(propositions)
 			propositions2 = deepcopy(propositions)
 			add_proposition(propositions2, p)
@@ -289,7 +291,7 @@ while(True):
 				q_ext = assign_extensions(q, worlds, propositions)
 				b = permissable_implication(p_min, q_ext, worlds)
 				if b == True:
-					print("Given our preferences, %s is permissable, given %s  \n" % (q, p))
+					print("Given our preferences, %s is permissible, given %s  \n" % (q, p))
 				if b == False:
 					print("Given our preferences, %s is not permissible, given %s \n" % (q, p))
 
@@ -312,7 +314,7 @@ while(True):
 				q_ext = assign_extensions(q, worlds_extended, propositions2)
 				b = permissable_implication(p_min, q_ext, worlds_extended)
 				if b == True:
-					print("Given our preferences, %s is permissable, given %s  \n" % (q, p))
+					print("Given our preferences, %s is permissible, given %s  \n" % (q, p))
 				if b == False:
 					print("Given our preferences, %s is not permissible, given %s \n" % (q, p))
 
@@ -357,6 +359,7 @@ while(True):
 		elif(com == "11"):
 			#copyfile("filename", "temp.txt")
 			combined_file = open("temp2.txt", 'a+')
+			files.append(combined_file)
 			delete_file_content(combined_file)
 			file.seek(0)
 			for line in file:
@@ -368,9 +371,11 @@ while(True):
 			for line in new_file:
 				buf = line
 				combined_file.write("%s\n" % (buf))
+			new_file.close()
 			combined_file.close()
 			combined_file = open("temp2.txt", 'r+')
-			
+			for line in combined_file:
+				print(line)
 			combined_file.seek(0)
 
 			data = initiate(combined_file)
@@ -510,7 +515,8 @@ while(True):
 			save.write("\n")
 			save.write("Constraints: \n")
 			for c, con in constraints.items():
-				save.write("%s\n" % (con))
+				line = c + " " + con.item
+				save.write("%s\n" % (line))
 			save.write("\n")
 
 			print("Please select one of the following:\n")
@@ -518,6 +524,7 @@ while(True):
 				print (k, v)
 
 			selection = input()
+			save.write("Sorted worlds with their rule violations: \n")
 			if selection == "1":
 				sorted_worlds = sorted(worlds.values(), key =lambda x: len(x.F))
 				for i in sorted_worlds:
@@ -528,10 +535,11 @@ while(True):
 					save.write("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
 				save.write("%s \n" % ("\n"))
 
-			while  True:
-				more = input("Would you like to agument your file with the best f worlds, for some formula f? (y/n)\n")
+			while True:
+				more = input("Would you like to augment your file with the best f worlds, for some formula f? (y/n)\n")
 				if more == "n":
 					save.close()
+					print("%s has been written to your directory \n" % (text_name))
 					break
 				if more == "y":
 					formula = input("Please write a formula to check \n")
@@ -550,12 +558,14 @@ while(True):
 						formula_min = get_min_F_weight(formula_ext, worlds)
 					for w in formula_min:
 						save.write("%s: %s, %s \n" % (w.name, w.state, w.F))
-					save.write("%s \n" % ("\n"))
+					save.write("\n")
 				else:
 					print("Please input either 'y' or 'n' \n")
 
+
 		elif(com == "14"):
-			file.close()
+			for f in files:
+				f.close()
 			break
 		else:
 			print("I'm sorry, you did not input a recognized command, please try again. \n")
@@ -563,5 +573,6 @@ while(True):
 		while(more != "y" and more != "n"):
 			more = input("Would you like to make another query?  (y, n) \n")
 		if(more == 'n'):
-			file.close()
+			for f in files:
+				f.close()
 			break

@@ -1,0 +1,5 @@
+#game day
+
+(s -> b)
+(s&r -> ~b)
+(s&r&c -> b)
