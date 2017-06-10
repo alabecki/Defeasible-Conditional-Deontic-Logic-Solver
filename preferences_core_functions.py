@@ -20,13 +20,9 @@ from copy import deepcopy
 #Prompts user to enter the name if a file, if the file does not exist, it reiterates.
 def initiate(file):
 	file.seek(0)
-	print("File Lines:")
-	for line in file:
-		print(line)
 	file.seek(0)
 	propositions = obtain_atomic_formulas(file)
-	for p in propositions:
-		print (p)
+
 	file.seek(0)
 	rules = construct_rules_dict(file)		#parces input text, make a Rule object for each rule, saves objects in dictionary
 	file.seek(0)
@@ -91,35 +87,24 @@ def obtain_atomic_formulas(file):
 
 
 
-def delete_file_content(pfile):
-    pfile.seek(0)
-    pfile.truncate()
+def delete_file_content(file):
+    file.seek(0)
+    file.truncate()
 # Parses each line of the rule file to create a a dictionary of rules, distinguishing the item, body and head. The key is the name of the rule
 # while the value is the Rule object itself
 def construct_rules_dict(file):
 	lines = []
 	for line in file:
 		if line.startswith("("):
-			#line.replace(" ", "")			#any line starting with a "(" is interpreted as a rule
 			line = re.sub(r'\s+', '', line)
-			print("Print line: %s" % (line))
 			lines.append(line.strip())
 	steps = []
 	for line in lines:
 		steps.append(re.split("->|\$", line))
-			#i = re.sub(r'\s+', '', i)
 	for step in steps:
-		print("step: %s " % (step))
-		#print("[0], [1] %s %s " % (step[0], step[1]))
-		#if len(step[0]) > 1:
 		step[0] = step[0][1:]
-		#else:
-			#step[0] = step[0].replace("()", " ")
-			#step[0] = step[0][0:0]
-		#print(len(step))
-		#print (len(step[1]))
+		
 		step[1] = step[1][:-1]
-		#print("[0], [1] %s %s " % (step[0], step[1]))
 	rules = {}
 	count = 0
 	for line in steps:
@@ -139,29 +124,47 @@ def construct_rules_dict(file):
 def add_rules_from_file(file, rules):
 	lines = []
 	for line in file:
-		if line.startswith("("):				#any line starting with a "(" is interpreted as a rule
+		if line.startswith("("):
+			line = re.sub(r'\s+', '', line)
 			lines.append(line.strip())
-	temp1 = [line[1:] for line in lines]		#remove "(" at the beginning of the rule
-	temp2 = [line[:-1] for line in temp1]		#remove the ")" at the end of the rule
-	temp3 = [line.split("->") for line in temp2]
-	count = len(rules.keys())										#used to assign each rule with a unique name
-	for line in temp3:
-		item = line[0] + "->" + line[1]				#stores the original rule
-		name = "r" + str(count)						#gives each rule a unique name "r" plus an integer
-		new = Rule(name, item, line[0], line[1])	#creates a new Rule object there line[0] and line[1] are the body and head
-		rules.update({name: new})					#adds the new rule to the dictionary of rules
+	steps = []
+	for line in lines:
+		steps.append(re.split("->|\$", line))
+	for step in steps:
+		step[0] = step[0][1:]
+		
+		step[1] = step[1][:-1]
+	count = 0
+	for line in steps:
+		name = "r" + str(count)
+		if len(line) == 2:
+			item = line[0] + " -> " + line[1]
+			new = Rule(name, item, line[0], line[1])
+		if len(line) == 3:
+			item = line[0] + " -> " + line[1] +  " $ " + line[2]
+			new = Rule(name, item, line[0], line[1], float(line[2]))
+		rules.update({name: new})
 		count += 1
 
 
+
+
 def add_rule(rule, rules):
+	rule = re.sub(r'\s+', '', rule)
+	step = (re.split("->|\$", rule))
+	step[0] = step[0][1:]
+	step[1] = step[1][:-1]
 	count = len(rules)
-	temp1 = rule[1:]
-	temp2 = temp1[:-1]
-	temp3 = temp2.split("->")
-	#print("New body: %s, new head: %s \n" % (temp3[0], temp3[1]))
-	item = temp3[0] + "->" + temp3[1]
 	name = "r" + str(count)
-	new = Rule(name, item, temp3[0], temp3[1])
+	if len(step) == 1: 
+		item = " " + " -> " + step[0]
+		new = Rule(name, item, " " , step[0])
+	if len(step) == 2:
+		item = step[0] + " -> " + step[1]
+		new = Rule(name, item, step[0], step[1])
+	if len(step) == 3:
+		item = step[0] + " -> " + step[1] +  " $ " + step[2]
+		new = Rule(name, item, step[0], step[1], float(step[2]))
 	rules.update({name: new})
 
 
@@ -282,10 +285,9 @@ def domination_relations(rules):
 				notbothheads = Not(temp3)
 				if valid(notbothheads) == True:
 					r2.dominatedBy.add(r1)
-			#	print("Check if either one has empty body")
 			else:
 				r1b_cnf = to_cnf(r1.body)
-				print(r2.body)
+				#print(r2.body)
 				r2b_cnf = to_cnf(r2.body)
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
@@ -465,7 +467,6 @@ def get_min_F_card(f_ext, worlds):
 	for w in f_ext:
 		world = get_world_from_state(w, worlds)
 		if world != None:
-			print(world)
 			if len(worlds[world].F) < best:
 				best = len(worlds[world].F)
 	for w in f_ext:
@@ -498,87 +499,32 @@ def permissable_implication(f1_min, f2ext, worlds):
 		return True
 	else:
 		return False
-
 def implicit_rule(r, worlds, worlds2, propositions2, rules2):
 	add_rule(r, rules2)
 	for k, rule in rules2.items():
 		rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
 		rule.headExtension = assign_extensions(rule.head, worlds2, propositions2)
-	domination_relations(rules2)
 	assign_rule_violations(worlds2, rules2)
-	print("Original Worlds")
-	for world in worlds.values():
-		print("%s %s: %s , %s\n" % (world.name, world.state, world.F, world.weightedF))
-	print("New Worlds (with new Rule)")
-	for world in worlds2.values():
-		print("%s %s: %s , %s\n" % (world.name, world.state, world.F, world.weightedF))
 
+	flag = True
 	for w2i, world2i in worlds2.items():
+	#	print(w2i, world2i.state)
 		for w2j, world2j in worlds2.items():
-			print("new")
-			print(world2i.F, world2j.F)
-			if world2i.F.issubset(world2j.F):
-		#	if world2i.F <= world2j.F:
+		#	print(w2j, world2j.state)
+			if world2i.F < world2j.F:
+				print("new")
+				print(w2i, world2i.F, w2j, world2j.F)
 				print("old")
 				print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2i].F.issubset(worlds[w2j].F) == False:
-					return False
-	for wi, worldi in worlds.items():
-		for wj, worldj in worlds.items():
-			print("-Old")
-			print(worldi.F, worldj.F)
-		#	if worldi.F <= worldj.F:
-			if worldi.F.issubset(worldj.F):
-				print("-new")
-				print(worlds2[wi].F, worlds2[wj].F)
-				#if worlds2[wi].F <= worlds2[wj].F == False:
-				if worlds2[wi].F.issubset(worlds2[wj].F) == False:
-					return False
-			#elif world2i.F >= world2j.F:
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				#if (worlds[w2i].F >= worlds[w2j].F) == False:
-	print("Check out")
-	return True
-
-
-def print_worlds_by_partial_order(worlds):
-	sequence = []
-	root = best_worlds_by_subset(worlds)
-	while len(root.keys()) != 0:
-		keys = list(root.keys())
-		for k in keys:
-			if len(worlds[k].dependency) == 0:
-				new = root.pop(k)
-				sequence.append(new)
-				continue
-			min_w = min_subset(worlds[k].dependency)
-			#for d in worlds[k].dependency:
-			for w in min_w :
-				print("Min: %s" % (w.name))
-				root[w.name] = w
-			new = root.pop(k)
-			print("New %s" % (new.name))
-			print("Current Root")
-			for r, ro in root.items():
-				print(r, ro.state)
-			sequence.append(new)
-			print("Current sequence")
-			for s in sequence:
-				print(s.name)
-
-
-def min_subset(_set):
-	min_worlds = set()
-	for s1 in _set:
-		check = True
-		for s2 in _set:
-			if s2.F.issubset(s1.F) and s1.F != s2.F:
-				check = False
-		if check == True:
-			min_worlds.add(s1)
-			#best_worlds.add(w1.name)
-	return min_worlds
+				if worlds[w2i].F >= worlds[w2j].F:
+					flag = False
+					return flag
+			elif world2i.F >= world2j.F:
+				if worlds[w2i].F < worlds[w2j].F:
+					flag = False
+					return flag
+	flag = True
+	return flag
 
 #def implicit_rule(r, best_worlds, rules2, worlds2, propositions2):
 	#first add r as a new rule
