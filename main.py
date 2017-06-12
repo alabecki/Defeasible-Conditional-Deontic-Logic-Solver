@@ -30,8 +30,8 @@ commands = {
 	"6": "Show the best worlds at which a formula f is true",
 	"7": "Determine whether, given R, the truth of 'a' makes 'b' obligatory (user provides a and b)",
 	"8": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
-	"9": "Determine whether, given our preferences, a further rule is implied (user provides new rule (a, b))",
-	"10": "Add rule to R",
+	"9": "Determine whether, given R, a further rule is implied (user provides new rule (a, b))",
+	"10": "Add a rule to R",
 	"11": "Augment current rules with rules from an additional file",
 	"12": "Additional Queries",
 	"13": "Write data to text-file",
@@ -146,17 +146,17 @@ while(True):
 				res = worst_worlds_by_subset(worlds)
 				print("The worst worlds are: \n")
 				for v in res.values():
-					print("%s: %s \n" % (v.name, v.F))
+					print("%s: %s, %s \n" % (v.name, v.state, v.F))
 			elif method == "2":
 				res = worst_worlds_by_cardinality(worlds)
 				print("The worst worlds are: \n")
 				for v in res.values():
-					print("%s: %s \n" % (v.name, v.F))
+					print("%s: %s, %s \n" % (v.name, v.state, v.F))
 			elif method == "3":
 				res = worst_worlds_by_weighted_cardinality(worlds)
 				print("The worst worlds are: \n")
 				for v in res.values():
-					print("%s: %s \n" % (v.name, v.weightedF))
+					print("%s: %s, %s \n" % (v.name, v.state, v.weightedF))
 		elif(com == "3"):
 			print("How would you like to evaulate the preference relationship between worlds? \n")
 			for k, v in evaluation_method.items():

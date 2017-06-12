@@ -1,6 +1,4 @@
 
-
- 
 Defeasable Conditional Deontic Logic Results
 
 Rules: 
@@ -15,27 +13,23 @@ r7  -> ~b $ 2
 r8 a|c -> b $ 3
 r9 a|b -> c&~c $ 2.5
 r10 a|a -> b|c $ 1.5
+r11 a -> ~b
 
 Constraints: 
-c0 b|~a
-c1 ~a|~b|c
+c0 ~a|~b|c
 
 Sorted worlds with their rule violations: 
-w0: {b: False, d: False, a: False, c: False}, {'r2'}, 1.0 
-w4: {b: False, d: True, a: False, c: False}, {'r2'}, 1.0 
-w11: {b: True, d: False, a: True, c: True}, {'r3'}, 1.0 
-w15: {b: True, d: True, a: True, c: True}, {'r3'}, 1.0 
-w8: {b: True, d: False, a: False, c: False}, {'r9'}, 2.5 
-w9: {b: True, d: False, a: False, c: True}, {'r9'}, 2.5 
-w12: {b: True, d: True, a: False, c: False}, {'r9'}, 2.5 
-w5: {b: False, d: True, a: False, c: True}, {'r8'}, 3.0 
-w13: {b: True, d: True, a: False, c: True}, {'r9', 'r1'}, 3.5 
-w1: {b: False, d: False, a: False, c: True}, {'r0', 'r8'}, 4.0 
-
- 
-The best ~a|b-worlds: 
-w0: {b: False, d: False, a: False, c: False}, {'r2'} 
-w4: {b: False, d: True, a: False, c: False}, {'r2'} 
-w15: {b: True, d: True, a: True, c: True}, {'r3'} 
-w11: {b: True, d: False, a: True, c: True}, {'r3'} 
-
+w10: {a: True, b: False, c: True, d: False}, set(), 0.0 
+w11: {a: True, b: False, c: True, d: True}, set(), 0.0 
+w0: {a: False, b: False, c: False, d: False}, {'r2'}, 1.0 
+w1: {a: False, b: False, c: False, d: True}, {'r2'}, 1.0 
+w3: {a: False, b: False, c: True, d: True}, {'r8'}, 3.0 
+w4: {a: False, b: True, c: False, d: False}, {'r9'}, 2.5 
+w5: {a: False, b: True, c: False, d: True}, {'r9'}, 2.5 
+w6: {a: False, b: True, c: True, d: False}, {'r9'}, 2.5 
+w9: {a: True, b: False, c: False, d: True}, {'r10'}, 1.5 
+w2: {a: False, b: False, c: True, d: False}, {'r8', 'r0'}, 4.0 
+w7: {a: False, b: True, c: True, d: True}, {'r9', 'r1'}, 3.5 
+w8: {a: True, b: False, c: False, d: False}, {'r4', 'r10'}, 2.5 
+w14: {a: True, b: True, c: True, d: False}, {'r3', 'r11'}, 2.0 
+w15: {a: True, b: True, c: True, d: True}, {'r3', 'r11'}, 2.0 

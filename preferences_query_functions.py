@@ -154,16 +154,6 @@ def worst_worlds_by_weighted_cardinality(worlds):
 			most_violated[w.name] = w
 
 
-def dom_of_r_in_w(_rule, _world, rules, worlds):
-	result = []
-	#_temp = re.findall(r'\d+', _world)
-	#temp = int(_temp[0])
-	for r, rule in rules.items():
-		a = (r, _rule)
-		if a in worlds[_world].dom:
-			result.append(r)
-	return result
-
 def check_rule_input(rules):
 	_rule = ""
 	rule_names = get_rule_names(rules)
@@ -182,30 +172,6 @@ def check_world_input(worlds):
 			print("You did not enter a world name, please try again \n")
 	return _world
 
-def check_rule_world_pair_input(worlds, rules):
-	while(True):
-		pair = input()
-		pair = re.sub(r"\s+", "", pair)
-		while("," not in pair):
-			print("There must be a comma between the rule and the world\n")
-			pair = input()
-			pair = re.sub(r"\s+", "", pair)
-		pair = pair.split(",")
-		rule_names = get_rule_names(rules)
-		world_names = get_world_names(worlds)
-
-		while(pair[0] not in rule_names or pair[1] not in world_names):
-			print("pair: %s \n" % (pair))
-			print("You did not enter a rule/world pair or did not enter it in the correct format (ri, wj), please try again \n")
-			pair = input()
-			pair = re.sub(r"\s+", "", pair)
-			pair = pair.split(",")
-			rule_names = get_rule_names(rules)
-			world_names = get_world_names(worlds)
-
-			if(pair[0] not in rule_names or pair[1] not in world_names):
-				print("You did not enter a rule/world pair or did not enter it in the correct format (ri, wj), please try again \n")
-		return pair
 
 def print_worlds_by_cardinality(worlds):
 	ordered_worlds = {}

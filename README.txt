@@ -3,11 +3,12 @@ _________________________________________________________________________
 _________________________________________________________________________ 
  
 0. Installation
-To run the program, Python 3.x must be installed on the computer. The 
-program was written on Python 3.6 but may run correctly on older 
+To run the program, Python 3.x a computer must have Python 3.x installed.
+The program was written on Python 3.6 but may run correctly on older 
 versions. It is recommended that the user should be using 3.4 or higher.
-The program can be opened in on the command-line in Windows or Bash in 
-Linux. 
+The program can be opened in on the command-line in Windows or Linux
+machine. 
+
 In the command line, go to the directory in which you have placed the 
 folder containing the program and type:
 
@@ -19,9 +20,8 @@ folder containing the program and type:
 The program makes use of the logic module from the sympy library, which 
 is itself dependent upon the pmath library. If these have not been 
 installed, the user will be informed when trying to run the program. 
-For installing Python libraries, it is recommended that the user use pip, 
-as it is the easiest method. To install sympy and pmath using pip simply 
-type:
+It is recommended that the user use pip when installing Python libraries.
+To install sympy and pmath using pip simply type:
 
 pip install sympy
 pip install pmath
@@ -43,24 +43,27 @@ World preference is determined in terms of rule violation. For each
 world w let w.F be the set of rules violated in w. The program supports 
 three options when determining preference relations between worlds. 
  
-Rules in the ‘txt.’ files must be written in the following format: 
+2. Rules and Constraints:
+Rules in the ‘.txt’ files must be written in the following format: 
 (b -> h), where 'a' and 'b' are formulas of propositional logic. "&" is 
 used for "and", "|" is used for "or", and "~" is used for negation. 
 Atomic propositions must be Latin letters. Some upper-case letters, 
-notably “N” and “S” often cause the SAT solver to crash, it is 
+notably “N” and “S” often cause the SAT solver to crash, so it is 
 recommended that the user stick with lower-case letters.  
 
 		Example:	( (~p | (~q | r)) -> (q & p) ) 
 
 Constraints are formulas preceded by an “!” 
 
-		Example:	!(~c | ~f) 
+		Example:	! ~c | ~f  
  
-The program is fairly flexible with the use of parentheses, provided that 
-the outermost parentheses are present and that parentheses are not 
-required to understand the meaning of the expression. 
+The program is fairly flexible with the use of parentheses, with the
+exceptions:
+	(1) The outermost parentheses for rules must be included
+	(2) Any parenthese required for understaning the meaning of the
+	expression must be included 
 
-Moreover, spacing within a rule is ignored. The following rule is 
+Moreover, spacing within a line ignored is ignored. The following rule is 
 perfectly acceptable: 
 
 		Example (a   & ~b &c -> p | q |r) 
@@ -81,9 +84,8 @@ Several example txt. files are included with the program.
 
 2. Commands: 
  
-Once a txt. file has been loaded and processed by the program the 
-following 
-queries can be made: 
+Once a .txt file has been loaded and processed by the program the 
+following queries can be made: 
  
 	1:	Show the set of most preferable worlds
 	2:	Show the set of least preferable worlds
