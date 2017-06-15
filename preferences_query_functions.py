@@ -9,31 +9,38 @@ from preferences_core_functions import*
 def compare_worlds_by_subset(u, v, worlds):
 	v = v.lstrip()
 	if (worlds[u].F >= worlds[v].F):
-		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
+		print("%s is preferable to %s " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 	elif worlds[v].F > worlds[u].F:
-		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
+		print("%s is preferable to %s " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 	else:
-		print("%s and %s are not comparable in terms of preference \n" % (worlds[u].name, worlds[v].name))
+		print("%s and %s are not comparable in terms of preference " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 
 def compare_worlds_by_cardinality(u, v, worlds):
 	v = v.lstrip()
 	if (len(worlds[u].F) >= len(worlds[v].F)):
-		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
+		print("%s is preferable to %s " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 	elif len(worlds[v].F) >= len(worlds[u].F):
-		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
+		print("%s is preferable to %s " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 
 def compare_worlds_by_weighted_cardinality(u, v, worlds):
-	v = vlstrip()
+	v = v.lstrip()
 	if(worlds[u].weightedF <= worlds[v].weightedF):
 		print(" %s is preferable to %s \n " % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 	elif (worlds[v].weightedF <= worlds[u].weightedF):
 		print("%s is preferable to %s \n" % (worlds[u].name, worlds[v].name))
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 		return
 
 def get_rule_names(rules):
@@ -91,7 +98,7 @@ def find_rule_violations(rule_name, rules, worlds):
 			a = (r, rule_name)
 			if( (a not in worlds[world].dom) or (worlds[world].state not in rule.bodyExtension) ):
 				if worlds[world] not in result:
-					print(worlds[world].name)
+					#print(worlds[world].name)
 					result.append(worlds[world])
 	return result
 
@@ -160,7 +167,8 @@ def check_rule_input(rules):
 	while(_rule not in rule_names):
 		_rule = input()
 		if _rule not in rule_names:
-			print("You did not enter a rule name, please try again\n")
+			print("You did not enter a rule name, please try again")
+			print("----------------------------------------------- \n")
 	return _rule
 
 def check_world_input(worlds):
@@ -176,11 +184,16 @@ def check_world_input(worlds):
 def print_worlds_by_cardinality(worlds):
 	ordered_worlds = {}
 	sorted_worlds = sorted(worlds.values(), key =lambda x: len(x.F))
+	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 	for i in sorted_worlds:
 		print("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
+	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
 
 def print_worlds_by_weighed_cardinality(worlds):
 	ordered_worlds = {}
+	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 	sorted_worlds = sorted(worlds.values(), key =lambda x: x.weightedF)
 	for i in sorted_worlds:
 		print("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
+	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")

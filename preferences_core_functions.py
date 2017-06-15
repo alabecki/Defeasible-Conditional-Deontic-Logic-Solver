@@ -21,18 +21,22 @@ from copy import deepcopy
 def initiate(file):
 	file.seek(0)
 	propositions = obtain_atomic_formulas(file)
-	for p in propositions:					#fetches all atomic formulas found in a rule or constraint
-		print (p)
+	#for p in propositions:					#fetches all atomic formulas found in a rule or constraint
+		#print (p)
 	file.seek(0)
 	#rules = {}
 	rules = construct_rules_dict(file)		# parses input text, make a Rule object for each rule, saves objects in dictionary
 	file.seek(0)
 	constraints = add_constraints(file)		#parses parces and saves contraints in a dictionary
+	print("Rules: ")
 	for k, v in rules.items():
 		print(k, v.item)
+	print("\n")
+	print("Constraints: ")
 	_worlds = construct_worlds(propositions)  #creates a dictionary of worlds
 	for k, v in constraints.items():
 		print(k, v.item)
+	print("\n")
 	worlds = reconstruct_worlds(propositions, constraints) #Next, exclude worlds that are prohibited by the constriants
 	print("Worlds after constraints: \n")
 	for w in worlds.values():
@@ -69,7 +73,7 @@ def obtain_atomic_formulas(file):
 			prop_char = set()
 			for char in line:
 				#print(str(char))
-				if(str(char).isalpha()):
+				if(str(char).isalpha()) and str(char) not in ["N", "o", "t"]:
 					prop_char.add(str(char))
 			for item in prop_char:
 				new = Symbol(item)
@@ -86,6 +90,7 @@ def delete_file_content(pfile):
 def construct_rules_dict(file):
 	lines = []
 	for line in file:
+		line = line.strip()
 		if line.startswith("("):
 			line = re.sub(r'\s+', '', line)
 			lines.append(line.strip())
@@ -112,8 +117,11 @@ def construct_rules_dict(file):
 
 
 def add_rule(rule, rules):
+	rule = rule.strip()
 	rule = re.sub(r'\s+', '', rule)
 	step = (re.split("->|\$", rule))
+	#print("Step 0 %s " % (step[0]))
+	#print("Step 1 %s " % (step[1]))
 	step[0] = step[0][1:]
 	step[1] = step[1][:-1]
 	count = len(rules)
@@ -129,11 +137,10 @@ def add_rule(rule, rules):
 		new = Rule(name, item, step[0], step[1], float(step[2]))
 	rules.update({name: new})
 
-
 def add_constraints(file):
 	lines = []
 	for line in file:
-		line.lstrip()
+		line.strip()
 		line = re.sub(r'\s+', '', line)
 		if line.startswith("!"):
 			lines.append(line.strip())
@@ -148,7 +155,6 @@ def add_constraints(file):
 		constraints.update({name: new})
 		count += 1
 	return constraints
-
 
 # Uses the output of obtain_atomic_formulas first create a table of Boolean values corresponding to a world. It then constructs its "state" as a dictionary
 # where the keys are propositions and the values are Booleans. The names and states are passed on as arguments to create a list of World objects.
@@ -217,7 +223,7 @@ def assign_extensions(formula, worlds, propositions):
 # Now that that head/body of each rule is assigned a set of world states, we can determine the domination relation
 #in each world in a straightforward manner in terms of the definition of the relation
 def domination_relations(rules):
-	print("Calculating Domination Relations___________________________________________________________________________________\n")
+	#print("Calculating Domination Relations______________________________________________________________________________\n")
 	dominations = set()
 	for k1, r1 in rules.items():	#and compare each rule with each of the others
 		for k2, r2 in rules.items():
@@ -275,7 +281,7 @@ def dom_dom_check(world, rule, flag):
 
 
 def assign_rule_violations(worlds, rules):
-	print("Assigning rule violations ________________________________________________________________________________")
+#	print("Assigning rule violations __________________________________________________________________________________")
 	for world in worlds.values():
 		for k, rule in rules.items():
 			#First check if the rule is False in the world under consideration
@@ -296,7 +302,7 @@ def assign_rule_violations(worlds, rules):
 
 
 def assign_rule_violations_recursive(worlds, rules):
-	print("Assigning rule violations ________________________________________________________________________________")
+#print("Assigning rule violations ________________________________________________________________________________")
 	for world in worlds.values():
 		for k, rule in rules.items():
 			#First check if the rule is False in the world under consideration
