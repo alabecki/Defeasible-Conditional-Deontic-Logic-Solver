@@ -1,0 +1,6 @@
+#cp2
+#I= Icecream, ~I = Cake
+
+( -> i)
+(M | ~F -> ~i)
+(~M & F -> i)

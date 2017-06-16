@@ -213,24 +213,26 @@ while(True):
 					compare_worlds_by_weighted_cardinality(pair[0], pair[1], worlds)
 
 			elif info == 4:
-				print("((((((((((((((((((((((((((((((((((((((((((*))))))))))))))))))))))))))))))))))))))))))\n")
+				print("__________________________________________________________________________________ \n")
 				print("Worlds ordered by cardinality of rule violation:")
 				print("__________________________________________________________________________________ \n")
 				print_worlds_by_cardinality(worlds)
 
 			elif info == 5:
-				print("((((((((((((((((((((((((((((((((((((((((((*))))))))))))))))))))))))))))))))))))))))))\n")
+				print("__________________________________________________________________________________ \n")
 				print("Worlds ordered by weighted cardinality of rule violation: ")
 				print("__________________________________________________________________________________ \n")
 				print_worlds_by_weighed_cardinality(worlds)
 
 			elif(info == 6):
-				print("((((((((((((((((((((((((((((((((((((((((((*))))))))))))))))))))))))))))))))))))))))))\n")
+				print("_____________________________________________________________________________________")
 				formula = input("Please write a formula to check ")
 				print("_____________________________________________________________________________________")
 				formula_ext = assign_extensions(formula, worlds, propositions)
-				print("((((((((((((((((((((((((((((((((((((((((((*))))))))))))))))))))))))))))))))))))))))))\n")
+				print("_____________________________________________________________________________________")
 				print("How would you like to evaluate the preference relationship between worlds? ")
+				print("_____________________________________________________________________________________")
+
 				for k, v in evaluation_method.items():
 					print(k, v)
 				print("-----------------------------------------------------------------------------------\n")
@@ -447,14 +449,19 @@ while(True):
 					#new = Rule(name, temp2, temp1[0], temp1[1])
 					D.append(temp2)
 					#D.update({name: new})
-				print("Domain length: %s " % (len(domain)))
+				#print("Domain length: %s " % (len(domain)))
 				for d in D:
-					print(d)
+					print("%s ____________________________________________________________ "% (d))
 					rules2 = deepcopy(rules)
+					#rules3 = deepcopy(rules)
 					worlds2 = reconstruct_worlds(propositions, constraints)
 					if implicit_rule(d, worlds, worlds2, propositions, rules2) == True:
-						print("rule added")
+						print ("True: add %s _____________________________________ " % (d))
+						#print("rule added")
+						#(d, rules3)
 						add_rule(d, rules)
+				#count = len(rules3)
+				#rules = deepcopy(rules3)
 				for k, rule in rules.items():
 					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
 					rule.headExtension = assign_extensions(rule.head, worlds, propositions)

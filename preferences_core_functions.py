@@ -468,21 +468,77 @@ def implicit_rule(r, worlds, worlds2, propositions2, rules2):
 	for k, rule in rules2.items():
 		rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
 		rule.headExtension = assign_extensions(rule.head, worlds2, propositions2)
+	domination_relations(rules2)
 	assign_rule_violations(worlds2, rules2)
 	flag = True
 	for w2i, world2i in worlds2.items():
 		for w2j, world2j in worlds2.items():
-			if world2i.F < world2j.F:
-				#print("new")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2i].F >= worlds[w2j].F:
+			if w2i == w2j:
+				continue
+			if world2i.F.issubset(world2j.F):
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if worlds[w2j].F.issubset(worlds[w2i].F) and worlds[w2j].F != worlds[w2i].F:
+					return False
+
+			if world2j.F.issubset(world2i.F) and world2i.F != world2j.F:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if worlds[w2i].F.issubset(worlds[w2j].F) and worlds[w2j].F != worlds[w2i].F:
+					return False
+
+			if worlds[w2i].F.issubset(worlds[w2j].F) and w2i != w2j:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if world2j.F.issubset(world2i.F) and world2j.F != world2i.F:
+					return False
+
+			if worlds[w2j].F.issubset(worlds[w2i].F):
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if world2i.F.issubset(world2j.F)  and world2j.F != world2i.F:
+					return False
+
+			if world2i.F.issubset(world2j.F) == False:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if worlds[w2i].F.issubset(worlds[w2j].F):
 					flag = False
 					return flag
-			elif world2i.F >= world2j.F:
-				if worlds[w2i].F < worlds[w2j].F:
+			if world2j.F.issubset(world2i.F) == False:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if worlds[w2j].F.issubset(worlds[w2i].F):
 					flag = False
 					return flag
-	flag = True
-	return flag
+
+			if worlds[w2j].F.issubset(worlds[w2i].F) == False:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if world2j.F.issubset(world2i.F):
+					flag = False
+					return flag
+
+			if worlds[w2i].F.issubset(worlds[w2j].F) == False:
+				print("new- sub")
+				print(w2i, world2i.F, w2j, world2j.F)
+				print("old")
+				print(worlds[w2i].F, worlds[w2j].F)
+				if world2i.F.issubset(world2j.F):
+					flag = False
+					return flag
+	return True
