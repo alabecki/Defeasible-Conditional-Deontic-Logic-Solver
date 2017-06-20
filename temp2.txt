@@ -1,23 +1,6 @@
+( -> ~k)
 
-
-#asd
-
-#comment
-
-(  -> b)
-
-(((a|~c)|d) -> ~b)
-
-(a|~c -> b)
-
-(a -> ~b)
-
-((a & ~c) -> b)
-
-((a&~c&d) -> ~b)
-
-#(a&~a -> b)
-
+(k -> g)
 # This is a test
 
 
