@@ -69,11 +69,13 @@ def get_file():
 def obtain_atomic_formulas(file):
 	propositions = set()
 	for line in file:
-		if line.startswith("(") or line.startswith("!"):
+		_line = line.strip()
+		if _line.startswith("(") or _line.startswith("!"):
+			_line.replace("Not", "")
 			prop_char = set()
-			for char in line:
+			for char in _line:
 				#print(str(char))
-				if(str(char).isalpha()) and str(char) not in ["N", "o", "t"]:
+				if(str(char).isalpha()):
 					prop_char.add(str(char))
 			for item in prop_char:
 				new = Symbol(item)
@@ -198,6 +200,7 @@ def assign_extensions(formula, worlds, propositions):
 			props_in_formula.add(add)
 		props_not_in_form = propositions.difference(props_in_formula)	#Determine which propositions are missing from the rule's body
 		supplement = Symbol('')
+		#print("formula: %s " % (formula))
 		form_cnf = to_cnf(formula)
 		for p in props_not_in_form:
 			supplement = Or(p, Not(p))							#Loop aguments (P | ~P) for each P not found in body
@@ -237,6 +240,8 @@ def domination_relations(rules):
 				continue
 			elif not r2.body:  # If r2 does not have a body will generally be dominated by r1 when the two heads collide
 			#str(r2.body).isspace():
+				#print("r1head: %s" %(r1.head))
+				#print("r2head: %s" % (r2.head))
 				r1h_cnf = to_cnf(r1.head)
 				r2h_cnf = to_cnf(r2.head)
 				temp3 = And(r1h_cnf, r2h_cnf )
@@ -476,69 +481,99 @@ def implicit_rule(r, worlds, worlds2, propositions2, rules2):
 			if w2i == w2j:
 				continue
 			if world2i.F.issubset(world2j.F):
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if worlds[w2j].F.issubset(worlds[w2i].F) and worlds[w2j].F != worlds[w2i].F:
 					return False
 
 			if world2j.F.issubset(world2i.F) and world2i.F != world2j.F:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if worlds[w2i].F.issubset(worlds[w2j].F) and worlds[w2j].F != worlds[w2i].F:
 					return False
 
 			if worlds[w2i].F.issubset(worlds[w2j].F) and w2i != w2j:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if world2j.F.issubset(world2i.F) and world2j.F != world2i.F:
 					return False
 
 			if worlds[w2j].F.issubset(worlds[w2i].F):
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if world2i.F.issubset(world2j.F)  and world2j.F != world2i.F:
 					return False
 
 			if world2i.F.issubset(world2j.F) == False:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if worlds[w2i].F.issubset(worlds[w2j].F):
 					flag = False
 					return flag
 			if world2j.F.issubset(world2i.F) == False:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if worlds[w2j].F.issubset(worlds[w2i].F):
 					flag = False
 					return flag
 
 			if worlds[w2j].F.issubset(worlds[w2i].F) == False:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if world2j.F.issubset(world2i.F):
 					flag = False
 					return flag
 
 			if worlds[w2i].F.issubset(worlds[w2j].F) == False:
-				print("new- sub")
-				print(w2i, world2i.F, w2j, world2j.F)
-				print("old")
-				print(worlds[w2i].F, worlds[w2j].F)
+				#print("new- sub")
+				#print(w2i, world2i.F, w2j, world2j.F)
+				#print("old")
+				#print(worlds[w2i].F, worlds[w2j].F)
 				if world2i.F.issubset(world2j.F):
 					flag = False
 					return flag
 	return True
+
+def from_prefix(rule):
+	res = rule.replace("Not(", "~")
+	res = res.replace(")->", "->")
+	res = res.replace("))", ")")
+	return res
+
+def strip_not(form):
+	res = form.replace( "Not(" , "")
+	res = res.replace( ")" , "")
+	return res
+
+
+	#step = (re.split("->|\$", rule))
+	#print("Step 0 %s " % (step[0]))
+	#print("Step 1 %s " % (step[1]))
+	#step[0] = step[0][1:]
+	#step[1] = step[1][:-1]
+	#count = len(rules)
+	#name = "r" + str(count)
+	#if len(step) == 1:
+#		item = " " + " -> " + step[0]
+#		new = Rule(name, item, " " , step[0])
+#	if len(step) == 2:
+#		item = step[0] + " -> " + step[1]
+#		new = Rule(name, item, step[0], step[1])
+#	if len(step) == 3:
+#		item = step[0] + " -> " + step[1] +  " $ " + step[2]
+#		new = Rule(name, item, step[0], step[1], float(step[2]))
+#	rules.update({name: new})

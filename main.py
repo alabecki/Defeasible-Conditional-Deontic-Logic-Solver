@@ -36,7 +36,8 @@ modal_analysis = {
 	"3": "Compare two specific worlds with respect to preference",
 	"4": "Show which rules are violated at each world ordered by number of rule violations",
 	"5": "Show which rules are violated at each world ordered by weighted number of rule violations",
-	"6": "Show the best worlds at which a formula f is true"
+	"6": "Show the best worlds at which a formula f is true",
+	"7": "Return to primary commands"
 }
 
 infrences_from_R = {
@@ -44,11 +45,13 @@ infrences_from_R = {
 	"2": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
 	"3": "Determine whether, given R, a further rule is implied (user provides new rule (a, b))",
 	"4": "Generate rules implied by R (generated rules will be added to R)",
+	"5": "Return to primary commands"
 }
 
 augmenting_R = {
 	"1": "Add a rule to R",
-	"2": "Augment current rules with rules from an additional file"
+	"2": "Augment current rules with rules from an additional file",
+	"3": "Return to primary commands"
 }
 
 debugging = {
@@ -64,13 +67,14 @@ debugging = {
 	"10": "Print head of a rule",
 	"11": "Show constraints",
 	"12": "Show weights of rules",
-	"13": "Show dependencies of each world"
+	"13": "Show dependencies of each world",
+	"14": "Return to primary commands"
 }
 
 evaluation_method = {
 	"1": "By subset relationships in terms of rule violation ",
 	"2": "In terms of the cardinality  of rule violations ",
-	"3": "In terms of the weighted cardinality of rule violations"
+	"3": "In terms of the weighted cardinality of rule violations",
 }
 
 save_options = {
@@ -121,16 +125,21 @@ while(True):
 			print("%s: %s " % (k, v))
 		com = input()
 		if(com == "1"):
-			print("\n__________________________________________________________________________________ ")
-			print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to know? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
-			print("____________________________________________________________________________________ \n")
-			for k, v in modal_analysis.items():
-				print(k, v)
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			info = "0"
-			while info not in range(1, 7):
-				info = int(input())
-			if info == 1:
+			numlist = list(range(1,8))
+			print(numlist)
+			characters = [str(n) for n in numlist]
+			for c in characters:
+				print(c)
+			while info not in characters:
+				print("\n__________________________________________________________________________________ ")
+				print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to know? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
+				print("____________________________________________________________________________________ \n")
+				for k, v in modal_analysis.items():
+					print(k, v)
+				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+				info = input()
+			if info == "1":
 				print("\n_______________________________________________________________________________ ")
 				print("\n How would you like to evaluate the preference relationship between worlds? \n")
 				for k, v in evaluation_method.items():
@@ -160,7 +169,7 @@ while(True):
 						print("%s: %s, %s \n" % (k, v.state, v.F))
 					else:
 						print("\nThat was not one of the avilable selections, please try again \n")
-			elif(info == 2):
+			elif(info == "2"):
 				print("_________________________________________________________________________________ ")
 				print("How would you like to evaluate the preference relationship between worlds? \n")
 				print("_________________________________________________________________________________ \n")
@@ -191,7 +200,7 @@ while(True):
 					for v in res.values():
 						print("%s: %s, %s \n" % (v.name, v.state, v.weightedF))
 					print("----------------------------------------------------------------------------------\n")
-			elif(info == 3):
+			elif(info == "3"):
 				print("_______________________________________________________________________________________ \n")
 				print("How would you like to evaluate the preference relationship between worlds? ")
 				for k, v in evaluation_method.items():
@@ -202,9 +211,14 @@ while(True):
 					method = input()
 				for world in worlds.values():
 					print("%s: %s \n" % (world.name, world.state))
+				check = [False, False]
+				while check[0] == False or check[1] == False:
 					_pair = input("which two worlds would you like to compare? (write: 'wi, wj', where i, j are integers) ")
-				print("_________________________________________________________________________________________________ \n")
-				pair = _pair.split(",")
+					print("_________________________________________________________________________________________________ \n")
+					pair = _pair.split(",")
+					check[0] = check_world_input2(pair[0], worlds)
+					check[1] = check_world_input2(pair[1], worlds)
+
 				if method == "1":
 					compare_worlds_by_subset(pair[0], pair[1], worlds)
 				if method == "2":
@@ -212,19 +226,19 @@ while(True):
 				if method == "3":
 					compare_worlds_by_weighted_cardinality(pair[0], pair[1], worlds)
 
-			elif info == 4:
+			elif info == "4":
 				print("__________________________________________________________________________________ \n")
 				print("Worlds ordered by cardinality of rule violation:")
 				print("__________________________________________________________________________________ \n")
 				print_worlds_by_cardinality(worlds)
 
-			elif info == 5:
+			elif info == "5":
 				print("__________________________________________________________________________________ \n")
 				print("Worlds ordered by weighted cardinality of rule violation: ")
 				print("__________________________________________________________________________________ \n")
 				print_worlds_by_weighed_cardinality(worlds)
 
-			elif(info == 6):
+			elif(info == "6"):
 				print("_____________________________________________________________________________________")
 				formula = input("Please write a formula to check ")
 				print("_____________________________________________________________________________________")
@@ -260,6 +274,8 @@ while(True):
 					for w in formula_min:
 						print (w.name, w.state, w.weightedF)
 					print("\n")
+			elif info == "7":
+				print("... \n")
 
 		elif(com == "2"):
 			print("\n_____________________________________________________________________________________ ")
@@ -269,7 +285,7 @@ while(True):
 				print(k, v)
 			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			infer = "0"
-			while infer not in range(1,5):
+			while infer not in range(1,6):
 				infer = int(input())
 			if infer == 1:
 				print("__________________________________________________________________________________ \n")
@@ -436,11 +452,13 @@ while(True):
 				#print("Number of formulas %s " % (len(formulas)))
 				#print("Domain")
 				#domain = list(product(formulas, repeat = 2))
+		
 				D = []
 				count = 0
 				for d in domain:
 					temp1 = list(d)
-					if temp1[0] == temp1[1] or str(temp1[0]) == "~" + str(temp1[1]) or str(temp1[1]) == "~" + str(temp1[0]):
+					
+					if strip_not(str(temp1[0])) == strip_not(str(temp1[1])):
 						continue
 					temp2 = "(" + str(temp1[0]) + "->" + str(temp1[1]) + ")"
 					#print("temp2: %s " % (temp2))
@@ -450,18 +468,32 @@ while(True):
 					D.append(temp2)
 					#D.update({name: new})
 				#print("Domain length: %s " % (len(domain)))
+				items = []
+				for r, rule in rules.items():
+					thing = rule.body + "->" + rule.head
+					items.append(thing)
+
 				for d in D:
-					print("%s ____________________________________________________________ "% (d))
+					_d = from_prefix(d)
+					print("%s ____________________________________________________________ "% (_d))
 					rules2 = deepcopy(rules)
 					#rules3 = deepcopy(rules)
+					
 					worlds2 = reconstruct_worlds(propositions, constraints)
-					if implicit_rule(d, worlds, worlds2, propositions, rules2) == True:
-						print ("True: add %s _____________________________________ " % (d))
+					if implicit_rule(_d, worlds, worlds2, propositions, rules2) == True:
+						#print ("True: add %s _____________________________________________ " % (_d))
 						#print("rule added")
 						#(d, rules3)
-						add_rule(d, rules)
-				#count = len(rules3)
-				#rules = deepcopy(rules3)
+						#translate = from_prefix(d)
+						check = _d.replace("(", "")
+						check = check.replace(")", "")
+						#print("Check:  %s " % (_d))
+						if check in items:
+							continue
+						else:
+							add_rule(_d, rules)
+
+				
 				for k, rule in rules.items():
 					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
 					rule.headExtension = assign_extensions(rule.head, worlds, propositions)
@@ -470,7 +502,9 @@ while(True):
 				print("R now consists of the following: ")
 				for r, rule in rules.items():
 					print(r, rule.item)
-				print("---------------------------------------------------------- \n")
+				print("-------------------------------------------------------------------- \n")
+			if infer == 5:
+				print("... \n")
 
 		elif(com == "3"):
 			print("\n____________________________________________________________________________ ")
@@ -480,7 +514,7 @@ while(True):
 				print(k, v)
 			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			add = "0"
-			while add not in range(1,3):
+			while add not in range(1,4):
 				add = int(input())
 			if add == 1:
 				print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n")
@@ -536,19 +570,20 @@ while(True):
 				for r, rule in rules.items():
 					print(r, rule.item)
 				print("---------------------------------------------------------- \n")
+			if add == 3:
+				print("... \n")
 
 		elif(com == "5"):
 			print("\n__________________________________________________________________________________ \n")
 			print("(¯`·._.·(¯`·._.(¯`·._ What else would you like to know? _.·´¯)·_.·´¯)·._.·´¯)")
 			print("__________________________________________________________________________________ \n")
 			com1 = " "
-			_choices = list(range(1, 16))
-			choices = ''.join(str(e) for e in _choices)
-			while (str(com1) not in choices):
+			choices = list(range(1, 15))
+			while (com1 not in choices):
 				for k, v in debugging.items():
 					print("%s: %s \n" % (k, v))
-				com1 = input()
-				if com1 == "1":
+				com1 = int(input())
+				if com1 == 1:
 					print("For which rule would you like to make your query? (type in name) ")
 					print("------------------------------------------------------------------ \n")
 					for k, rule in rules.items():
@@ -559,7 +594,7 @@ while(True):
 					for w in result:
 						print(w)
 
-				elif(com1 == "2"):
+				elif(com1 == 2):
 					print("For which rule would you like to make your query? (type in name) ")
 					print("------------------------------------------------------------------ \n")
 					for k, rule in rules.items():
@@ -573,14 +608,14 @@ while(True):
 						for w in result:
 							print("%s : %s \n" % (w.name, w.state))
 
-				elif(com1 == "3"):
+				elif(com1 == 3):
 					print("\n")
 					for w in worlds.values():
 						item = print_false_rules_at_w(w.name, rules, worlds)
 						print(w.state, item)
 					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 
-				elif(com1 == "4"):
+				elif(com1 == 4):
 					print("For which world would you like to make your query?")
 					for world in worlds.values():
 						print("%s: %s \n" % (world.name, world.state))
@@ -592,7 +627,7 @@ while(True):
 					print(result)
 					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 
-				elif(com1 == "5"):
+				elif(com1 == 5):
 					print("For which world would you like to make your query?")
 					for world in worlds.values():
 						print("%s: %s \n" % (world.name, world.state))
@@ -603,7 +638,7 @@ while(True):
 					print(result)
 					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 
-				elif(com1 == "6"):
+				elif(com1 == 6):
 					print("The following domination relations obtain: " )
 					print("__________________________________________ \n")
 					for rule in rules.values():
@@ -613,48 +648,51 @@ while(True):
 								print(dom.name)
 					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 
-				elif(com1 == "7"):
+				elif(com1 == 7):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
 						print("%s: %s \n" % (k, rule.item))
 					_rule =  check_rule_input(rules)
 					print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
 
-				elif(com1 == "8"):
+				elif(com1 == 8):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
 						print("%s: %s \n" % (k, rule.item))
 					_rule =  check_rule_input(rules)
 					print("Head extension of %s is:  %s \n" % (rules[_rule].head, rules[_rule].headExtension))
 
-				elif(com1 == "9"):
+				elif(com1 == 9):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
 						print("%s: %s \n" % (k, rule.item))
 					_rule =  check_rule_input(rules)
 					print(rules[_rule].body)
-				elif(com1 == "10"):
+				elif(com1 == 10):
 					print("For which rule would you like to make your query? (type in name) \n")
 					for k, rule in rules.items():
 						print("%s: %s \n" % (k, rule.item))
 					_rule =  check_rule_input(rules)
 					print(rules[_rule].head)
 
-				elif(com1 == "11"):
+				elif(com1 == 11):
 					for k, v in constraints:
 						print(v.name, v.item)
 
-				elif (com1 == "12"):
+				elif (com1 == 12):
 					for rule in rules.values():
 						print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
 
-				elif (com1 == "13"):
+				elif (com1 == 13):
 					for w, world in worlds.items():
 						print("World: %s \n" %  (world.name))
 						for d in world.dependency:
 							print(d.name, end=' ')
+				elif (com1 == 14):
+					print("...\n")
 				else:
-					print("I'm sorry, you did not input a recognized command, please try again. \n")
+					print("I'm sorry, you did not input a recognized command, please try again. \n")	
+		
 		elif(com == "4"):
 			print(" txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.\n")
 			text_name = input("Please provide a name for the text file (not including file extension)...\n ")

@@ -180,6 +180,15 @@ def check_world_input(worlds):
 			print("You did not enter a world name, please try again \n")
 	return _world
 
+def check_world_input2(world, worlds):
+	world_names = get_world_names(worlds)
+	wrd = world.strip(" ")
+	print (wrd)
+	if wrd not in world_names:
+		return False 
+	else:
+		return True
+
 
 def print_worlds_by_cardinality(worlds):
 	ordered_worlds = {}
