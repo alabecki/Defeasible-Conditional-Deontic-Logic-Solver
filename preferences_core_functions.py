@@ -34,6 +34,9 @@ def initiate(file):
 	print("\n")
 	print("Constraints: ")
 	_worlds = construct_worlds(propositions)  #creates a dictionary of worlds
+	for w in _worlds.values():
+		print(w.state)
+
 	for k, v in constraints.items():
 		print(k, v.item)
 	print("\n")
@@ -70,17 +73,25 @@ def obtain_atomic_formulas(file):
 	propositions = set()
 	for line in file:
 		_line = line.strip()
+		_line = re.sub(r'\s+', '', _line)
 		if _line.startswith("(") or _line.startswith("!"):
-			_line.replace("Not", "")
-			prop_char = set()
-			for char in _line:
-				#print(str(char))
-				if(str(char).isalpha()):
-					prop_char.add(str(char))
-			for item in prop_char:
-				new = Symbol(item)
+			_line = _line.replace("~", "")
+			_line = _line.replace("&", ",")
+			_line = _line.replace("|", ",")
+			_line = _line.replace("(", "")
+			_line = _line.replace(")", "")
+			_line = _line.replace("->", ",")
+			_line = _line.replace("!", "")
+			new_props = _line.split(",")
+			new_props = list(filter(None, new_props))
+			for prop in new_props:
+				if prop == "":
+					continue 
+				new = Symbol(prop)
 				propositions.add(new)
-	return propositions						#returns the set of propositions involved in the set of rules
+			#propositions.add(_new)
+	return propositions
+
 
 
 def delete_file_content(pfile):
