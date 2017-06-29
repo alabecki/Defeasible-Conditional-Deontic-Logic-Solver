@@ -45,7 +45,9 @@ infrences_from_R = {
 	"2": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
 	"3": "Determine whether, given R, a further rule is implied (user provides new rule (a, b))",
 	"4": "Generate rules implied by R (generated rules will be added to R)",
-	"5": "Return to primary commands"
+	"5": "Generate all entailments of obligation on R (restricted to literals)",
+	"6": "Generate all entailments of permissibility on R (restricted to literals)",
+	"7": "Return to primary commands"
 }
 
 augmenting_R = {
@@ -84,17 +86,17 @@ save_options = {
 
 #Main_____________________________________________________________________________________________________________________
 print("\n \n")
-print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&-> ")
-print("__________________________________________________________________________________\n")
-print("(¯`·._.·(¯`·._.(¯`·._ Welcome to the Naive Preferences Solver _.·´¯)·_.·´¯)·._.·´¯)")
-print("__________________________________________________________________________________ \n")
-print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&-> \n")
+print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&-> ")
+print("_________________________________________________________________________________________\n")
+print("(¯`·._.·(¯`·._.(¯`·_Welcome to the Defeasible Conditional Logic Solver_·´¯)·_.·´¯)·._.·´¯)")
+print("__________________________________________________________________________________________ \n")
+print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&-> \n")
 
 while(True):
 	do = ""
 	print("What would you like to do? \n")
 	while(do != "1" and do !="2"):
-		do = input("(1) Open a file, (2), exit program\n")
+		do = input("1: Open a file, 2: exit program\n")
 		if(do == "2"):
 			sys.exit()
 		if(do == "1"):
@@ -117,7 +119,7 @@ while(True):
 
 	_continue = True
 	while(True):
-		print("\n((((((((((((((((((((((((((((((((((((((((((*))))))))))))))))))))))))))))))))))))))))))\n")
+		print("\n__________________________________________________________________________________ ")
 		print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to do? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
 		print("____________________________________________________________________________________ \n")
 
@@ -216,8 +218,14 @@ while(True):
 					_pair = input("which two worlds would you like to compare? (write: 'wi, wj', where i, j are integers) ")
 					print("_________________________________________________________________________________________________ \n")
 					pair = _pair.split(",")
+					if "," not in _pair:
+						print("The input is not in the right format, please try again")
+						continue
 					check[0] = check_world_input2(pair[0], worlds)
 					check[1] = check_world_input2(pair[1], worlds)
+					if check[0] == False or check[1] == False:
+						print("The input did not conist of two worlds seperated by a comma, please try again")
+						continue
 
 				if method == "1":
 					compare_worlds_by_subset(pair[0], pair[1], worlds)
@@ -274,8 +282,12 @@ while(True):
 					for w in formula_min:
 						print (w.name, w.state, w.weightedF)
 					print("\n")
+				else:
+					print("Please select one of the following options...")
 			elif info == "7":
 				print("... \n")
+			else:
+				print("Please select one of the following options...")
 
 		elif(com == "2"):
 			print("\n_____________________________________________________________________________________ ")
@@ -285,7 +297,7 @@ while(True):
 				print(k, v)
 			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			infer = "0"
-			while infer not in range(1,6):
+			while infer not in range(1,8):
 				infer = int(input())
 			if infer == 1:
 				print("__________________________________________________________________________________ \n")
@@ -311,15 +323,15 @@ while(True):
 					if method == "2":
 						p_min = get_min_F_card(p_ext, worlds)
 					if method == "3":
-						p_min_ = get_min_F_weight(p_ext, worlds)
+						p_min = get_min_F_weight(p_ext, worlds)
 					q_ext = assign_extensions(q, worlds, propositions)
 					b = obligation_implication(p_min, q_ext, worlds)
 					if b == True:
-						print("Given our preferences, %s obligates  %s \n" % (p, q))
-						print("**************************************** \n")
+						print("Given our preferences, %s entails that %s is obligatory\n" % (p, q))
+						print("________________________________________________________\n")
 					if b == False:
-						print("Given our preferences, %s does not obligate %s " % (p, q))
-						print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+						print("Given our preferences, %s does not entail that %s is obligatory \n" % (p, q))
+						print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 				else:
 					worlds_extended = reconstruct_worlds(propositions2, constraints)
 					rules2 = deepcopy(rules)
@@ -338,11 +350,11 @@ while(True):
 					q_ext = assign_extensions(q, worlds_extended, propositions2)
 					b = obligation_implication(p_min, q_ext, worlds_extended)
 					if b == True:
-						print("Given our preferences, %s obligates  %s \n" % (p, q))
-						print("*******************************************\n")
+						print("Given our preferences, %s entails that %s is obligatory\n" % (p, q))
+						print("________________________________________________________\n")
 					if b == False:
-						print("Given our preferences, %s does not obligate %s \n" % (p, q))
-						print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+						print("Given our preferences, %s does not entail that %s is obligatory \n" % (p, q))
+						print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 
 			elif(infer == 2):
 				print("__________________________________________________________________________________ \n")
@@ -373,11 +385,11 @@ while(True):
 					q_ext = assign_extensions(q, worlds, propositions)
 					b = permissable_implication(p_min, q_ext, worlds)
 					if b == True:
-						print("Given our preferences, %s is permissible, given %s  \n" % (q, p))
-						print("************************************************* \n")
+						print("Given our preferences, %s entails that %s is permissible \n" % (p, q))
+						print("________________________________________________________ \n")
 					if b == False:
-						print("Given our preferences, %s is not permissible, given %s \n" % (q, p))
-						print("*************************************************** \n")
+						print("Given our preferences, %s does not entail that %s is permissible \n" % (p, q))
+						print("________________________________________________________________ \n")
 				else:
 					worlds_extended = reconstruct_worlds(propositions2, constraints)
 					rules2 = deepcopy(rules)
@@ -397,11 +409,11 @@ while(True):
 					q_ext = assign_extensions(q, worlds_extended, propositions2)
 					b = permissable_implication(p_min, q_ext, worlds_extended)
 					if b == True:
-						print("Given our preferences, %s is permissible, given %s  \n" % (q, p))
-						print("************************************************** \n")
+						print("Given our preferences, %s entails that %s is permissible " % (p, q))
+						print("________________________________________________________ \n")
 					if b == False:
-						print("Given our preferences, %s is not permissible, given %s \n" % (q, p))
-						print("***************************************************** \n")
+						print("Given our preferences, %s does not entail that %s is permissible \n" % (p, q))
+						print("_________________________________________________________________ \n")
 
 			elif(infer == 3):
 				print("->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->\n")
@@ -438,23 +450,22 @@ while(True):
 
 			elif(infer == 4):
 				print("|- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |-  \n")
-				print("Calculating implications of R: \n")
-				props = deepcopy(propositions)
-				for p in propositions:
-					neg = str(p)
-					neg = "Not(" + neg + ")"
-					neg = symbols(neg)
-					props.add(neg)
-				formulas = []
-				for p in props:
-					formulas.append(p)
-				domain = list(product(formulas, repeat = 2))
+				print("Calculating implicit rules: \n")
+				#props = deepcopy(propositions)
+				domain = generate_prop_product(propositions, rules, constraints)
+				#for p in propositions:
+				#	neg = str(p)
+				#	neg = "Not(" + neg + ")"
+				#	neg = symbols(neg)
+				#	props.add(neg)
+			#	formulas = []
+			#	for p in props:
+			#		formulas.append(p)
+			#	domain = list(product(formulas, repeat = 2))
 				#print("Number of formulas %s " % (len(formulas)))
 				#print("Domain")
 				#domain = list(product(formulas, repeat = 2))
-		
 				D = []
-				count = 0
 				for d in domain:
 					temp1 = list(d)
 					
@@ -475,7 +486,7 @@ while(True):
 
 				for d in D:
 					_d = from_prefix(d)
-					print("%s ____________________________________________________________ "% (_d))
+					#print("%s ____________________________________________________________ "% (_d))
 					rules2 = deepcopy(rules)
 					#rules3 = deepcopy(rules)
 					
@@ -493,7 +504,6 @@ while(True):
 						else:
 							add_rule(_d, rules)
 
-				
 				for k, rule in rules.items():
 					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
 					rule.headExtension = assign_extensions(rule.head, worlds, propositions)
@@ -503,8 +513,46 @@ while(True):
 				for r, rule in rules.items():
 					print(r, rule.item)
 				print("-------------------------------------------------------------------- \n")
-			if infer == 5:
+		
+
+			elif (infer == 5):
+				print("|= |= |= |= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |= \n")
+				print("Calculating Literal Entailments of Obligation on R: \n")
+				domain = generate_prop_product(propositions, rules, constraints)
+				for d in domain:
+					#print("d[0]: %s" % (d[0]))
+					#print("d[1]: %s" % (d[1]))
+					res = set_up_implications(d, worlds, propositions)
+					if res == "nil":
+						continue
+					t1min = res[0]
+					t2ext = res[1]
+					a = res[2]
+					b = res[3]
+		
+					if obligation_implication(t1min, t2ext, worlds) == True:
+						print("%s |= %s" % (a, b))
+				print("\n")
+
+			elif (infer == 6):
+				print("|= |= |= |= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |= \n")
+				print("Calculating Literal Entailments of Permissibility on R: \n")
+				domain = generate_prop_product(propositions, rules, constraints)
+				for d in domain:
+					res = set_up_implications(d, worlds, propositions)
+					if res == "nil":
+						continue
+					t1min = res[0]
+					t2ext = res[1]
+					a = res[2]
+					b = res[3]
+					#print(t2ext)
+					if permissable_implication(t1min, t2ext, worlds) == True:
+						print("%s |= %s" % (a, b))
+
+			if infer == 7:
 				print("... \n")
+						
 
 		elif(com == "3"):
 			print("\n____________________________________________________________________________ ")
@@ -776,11 +824,11 @@ while(True):
 			print("I'm sorry, you did not input a recognized command, please try again. ")
 			print(".....")
 
-		more = ""
-		while(more != "y" and more != "n"):
-			more = input("Would you like to make another query?  (y, n) \n")
-			print("____________________________________________________ \n")
-		if(more == 'n'):
-			for f in files:
-				f.close()
-			break
+		#more = ""
+		#while(more != "y" and more != "n"):
+		#	more = input("Would you like to make another query?  (y, n) \n")
+		#	print("____________________________________________________ \n")
+		#if(more == 'n'):
+		#	for f in files:
+		#		f.close()
+		#	break

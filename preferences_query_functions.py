@@ -1,8 +1,23 @@
 #Query Functions
 
-from copy import deepcopy
 from preference_classes import*
 from preferences_core_functions import*
+
+from sympy import Symbol
+from sympy.abc import*
+from sympy.logic.boolalg import to_cnf
+from sympy.logic.boolalg import Not, And, Or
+from sympy.logic.inference import satisfiable, valid
+from mpmath import*
+import sys
+from copy import deepcopy
+from shutil import copyfile
+from itertools import*
+from itertools import product, combinations
+
+from preferences_core_functions import*
+
+import re
 
 #Since the F attribute of worlds is a set (the set of rules violated by a world) we can compare different worlds through
 #set operations with respect to F
@@ -85,6 +100,143 @@ def get_world_from_state(_state, worlds):
 	#		print("check")
 			result = world.name
 			return result
+
+# Used to find the best f-worlds when evaluated in terms of w.F subsets
+def get_min_F_subset(f_ext, worlds):
+	f_min = set()
+	for e1 in f_ext:
+		w1 = get_world_from_state(e1, worlds)
+		if w1 != None:
+			f_min.add(worlds[w1])
+			for e2 in f_ext:
+				w2 = get_world_from_state(e2, worlds)
+				if w2 != None:
+					if worlds[w2].F < worlds[w1].F:
+						f_min.remove(worlds[w1])
+						break
+	return f_min
+
+# Used to find the best f-worlds when evaluated in terms of the weighted cardinality of rule violations
+def get_min_F_weight(f_ext, worlds):
+	f_min = set()
+	best = 99999999
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if world != None:
+			if worlds[world].weightedF < best:
+				best = worlds[world].weightedF
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if world != None:
+			if worlds[world].weightedF == best:
+				f_min.add(worlds[world])
+	return f_min
+
+# Used to find the best f-worlds when evaulated in terms of the cardinality of rule violations
+def get_min_F_card(f_ext, worlds):
+	f_min = set()
+	best = 99999999
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if world != None:
+			if len(worlds[world].F) < best:
+				best = len(worlds[world].F)
+	for w in f_ext:
+		world = get_world_from_state(w, worlds)
+		if world != None:
+			if len(worlds[world].F) == best:
+				f_min.add(worlds[world])
+	return f_min
+
+
+# Used to determine whether, given R, if  O(a |- b)
+def obligation_implication(f1_min, f2ext, worlds):
+	Flag = True
+	if len(f1_min) == 0:
+		return
+	#print("f1_min: %s" % (f1_min))
+	#print("f2ext: %s" % (f2ext))
+	for w in f1_min:
+	#	print("w.state: %s " % (w.state))
+		if w.state not in f2ext:
+			Flag = False
+			return False
+	if Flag == True:
+		return True
+	else:
+		return False
+
+# Used to determine whether, given R, if  P(a |- b)
+def permissable_implication(f1_min, f2ext, worlds):
+	Flag = False
+	for w in f1_min:
+		if w.state in f2ext:
+			Flag = True
+			return True
+	if Flag == True:
+		return True
+	else:
+		return False
+
+# Used to determine whether a rule, provided by user input, is implied by those already given
+def implicit_rule(r, worlds, worlds2, propositions2, rules2):
+	add_rule(r, rules2)
+	for k, rule in rules2.items():
+		rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
+		rule.headExtension = assign_extensions(rule.head, worlds2, propositions2)
+	domination_relations(rules2)
+	assign_rule_violations(worlds2, rules2)
+	flag = True
+	for w2i, world2i in worlds2.items():
+		for w2j, world2j in worlds2.items():
+			if w2i == w2j:
+				continue
+			if world2i.F.issubset(world2j.F):
+				if worlds[w2j].F.issubset(worlds[w2i].F) and worlds[w2j].F != worlds[w2i].F:
+					return False
+			if world2j.F.issubset(world2i.F) and world2i.F != world2j.F:
+				if worlds[w2i].F.issubset(worlds[w2j].F) and worlds[w2j].F != worlds[w2i].F:
+					return False
+			if worlds[w2i].F.issubset(worlds[w2j].F) and w2i != w2j:
+				if world2j.F.issubset(world2i.F) and world2j.F != world2i.F:
+					return False
+			if worlds[w2j].F.issubset(worlds[w2i].F):
+				if world2i.F.issubset(world2j.F)  and world2j.F != world2i.F:
+					return False
+			if world2i.F.issubset(world2j.F) == False:
+				if worlds[w2i].F.issubset(worlds[w2j].F):
+					flag = False
+					return flag
+			if world2j.F.issubset(world2i.F) == False:
+				if worlds[w2j].F.issubset(worlds[w2i].F):
+					flag = False
+					return flag
+			if worlds[w2j].F.issubset(worlds[w2i].F) == False:
+				if world2j.F.issubset(world2i.F):
+					flag = False
+					return flag
+			if worlds[w2i].F.issubset(worlds[w2j].F) == False:
+				if world2i.F.issubset(world2j.F):
+					flag = False
+					return flag
+	return True
+
+def from_prefix(rule):
+	res = rule.replace("Not(", "~")
+	res = res.replace(")->", "->")
+	res = res.replace("))", ")")
+	return res
+
+def strip_not(form):
+	res = form.replace( "Not(" , "")
+	res = res.replace( ")" , "")
+	return res
+
+def from_prefix2(p):
+	res = p.replace("Not(", "~")
+	res = res.replace(")", "")
+	return res
+
 
 # The remaining functions are used for various queries that the user might make.
 def find_rule_violations(rule_name, rules, worlds):
@@ -206,3 +358,50 @@ def print_worlds_by_weighed_cardinality(worlds):
 	for i in sorted_worlds:
 		print("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
 	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
+
+def generate_prop_product(propositions, rules, constraints):
+	conditions = set()
+	obligations = set()
+	for p in propositions:
+		neg = str(p)
+		neg = "Not(" + neg + ")"
+		neg = symbols(neg)
+		for rule in rules.values():
+			if str(p) in rule.body or "~" + str(p) in rule.body:
+				conditions.add(p)
+				conditions.add(neg)
+			if str(p) in rule.head or "~" + str(p) in rule.head:
+				obligations.add(p)
+				obligations.add(neg)
+		for k, v in constraints.items():
+			if str(p) in v.item or "~" + str(p) in v.item:
+				conditions.add(p)
+				conditions.add(neg)
+				obligations.add(p)
+				obligations.add(neg)
+	domain = product(conditions, obligations)
+	
+	return domain
+
+def set_up_implications(d, worlds, propositions):
+	temp = list(d)
+	if strip_not(str(temp[0])) == strip_not(str(temp[1])):
+		return "nil"
+	a = from_prefix2(str(temp[0]))
+	b = from_prefix2(str(temp[1]))
+	for c in a:
+		c = symbols(c)
+	for c in b:
+		c = symbols(c)
+	t1ext = assign_extensions(a, worlds, propositions)
+	t1ext = list(t1ext)
+	#print("t1ext:  %s" % (t1ext))
+	t1min = get_min_F_subset(t1ext, worlds)
+	if len(t1min) == 0:
+		return "nil"
+	#print("t1min: %s" % (t1min))
+	t2ext = assign_extensions(b, worlds, propositions)
+	t2ext = list(t2ext)
+	res = [t1min, t2ext, a, b]
+	return res

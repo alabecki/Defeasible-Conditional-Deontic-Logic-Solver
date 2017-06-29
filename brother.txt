@@ -1,0 +1,50 @@
+# hn = help neighbor
+# hb= help brother
+# bnh = brother need your help
+# ia = to do an illegal activity
+
+(  -> hn)
+(bnh -> hb)
+(ia & bnh -> ~hb)
+
+! ~(hn & hb)
+
+
+w11 {bnh: True, hb: False, hn: True, ia: True} set()
+
+
+hb |- ~ia
+hb |- ~bnh
+hb |- bnh
+hb |- ia
+hb |- ~hn
+~ia |- ~hb
+~ia |- hn
+~ia |- ~bnh
+~hb |- ~ia
+~hb |- hn
+~hb |- ~bnh
+~hb |- bnh
+~hb |- ia
+hn |- ~ia
+hn |- ~hb
+hn |- ~bnh
+hn |- bnh
+hn |- ia
+~bnh |- ~ia
+~bnh |- ~hb
+~bnh |- hn
+~bnh |- ia
+bnh |- ~hb
+bnh |- hn
+bnh |- ia
+ia |- ~hb
+ia |- hn
+ia |- ~bnh
+ia |- bnh
+~hn |- hb
+~hn |- ~ia
+~hn |- ~hb
+~hn |- ~bnh
+~hn |- bnh
+~hn |- ia

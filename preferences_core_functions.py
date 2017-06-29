@@ -10,10 +10,11 @@ from itertools import product
 from preference_classes import Rule
 from preference_classes import World
 from preference_classes import Constraint
-from preferences_query_functions import*
+#from preferences_query_functions import*
 import os
 import re
 from copy import deepcopy
+from itertools import*
 
 #		Functions_______________________________________________________________________________________________________________________________________________
 
@@ -34,16 +35,13 @@ def initiate(file):
 	print("\n")
 	print("Constraints: ")
 	_worlds = construct_worlds(propositions)  #creates a dictionary of worlds
-	for w in _worlds.values():
-		print(w.state)
+	#for w in _worlds.values():
+	#	print(w.state)
 
 	for k, v in constraints.items():
 		print(k, v.item)
 	print("\n")
 	worlds = reconstruct_worlds(propositions, constraints) #Next, exclude worlds that are prohibited by the constriants
-	print("Worlds after constraints: \n")
-	for w in worlds.values():
-		print(w.state)
 	for k, rule in rules.items():
 		rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)		#obtains extension of bodies of rules
 		rule.headExtension = assign_extensions(rule.head, worlds, propositions)		#obtains extensions of heads of rules
@@ -74,6 +72,8 @@ def obtain_atomic_formulas(file):
 	for line in file:
 		_line = line.strip()
 		_line = re.sub(r'\s+', '', _line)
+		_line = _line.split("$")
+		_line = _line[0]
 		if _line.startswith("(") or _line.startswith("!"):
 			_line = _line.replace("~", "")
 			_line = _line.replace("&", ",")
@@ -91,7 +91,6 @@ def obtain_atomic_formulas(file):
 				propositions.add(new)
 			#propositions.add(_new)
 	return propositions
-
 
 
 def delete_file_content(pfile):
@@ -195,11 +194,15 @@ def construct_worlds(propositions):
 	return worlds
 
 
+def findsubsets(S,m):
+	return set(combinations(S, m))
+
+
 # Assigns each rule head and rule body a set of possible worlds, namely those in which it is true
 #Since a given rule body/head will typically not include all atomic propositions found within the rule-set, directly applying  #a SAT solver on this formula will not give us the worlds we are looking for, since each world should assign truth values to  #all propositions found in the rule-set. So given a body/head x, if P is a proposition found in the set of rules but not in x, #then x will be augmented with &(P | ~P).
 def assign_extensions(formula, worlds, propositions):
 	extension = []
-	if str(formula).isspace() or len(formula) == 0:			#if the formula is empty it will be treated as a toutology
+	if str(formula).isspace() or len(str(formula)) == 0:			#if the formula is empty it will be treated as a toutology
 		#print("Check Empty\n")
 		for w in worlds.values():
 			extension.append(w.state)
@@ -230,7 +233,8 @@ def assign_extensions(formula, worlds, propositions):
 				#else:
 				for key, value in state.items():
 					new[key] = value
-					extension.append(new)
+					if new not in extension:
+						extension.append(new)
 	return extension
 
 
@@ -385,9 +389,21 @@ def best_worlds_by_weighted_cardinality(worlds):
 
 
 def add_proposition(propositions, p):
-	for char in p:
-		if (str(char).isalpha()):
-			propositions.add(Symbol(char))
+	_p = p.strip()
+	_p = re.sub(r'\s+', '', _p)
+	_p = _p.replace("~", "")
+	_p = _p.replace("&", ",")
+	_p = _p.replace("|", ",")
+	_p = _p.replace("(", "")
+	_p = _p.replace(")", "")
+	_p = _p.replace("->", ",")
+	_p = _p.replace("!", "")
+	new_props = _p.split(",")
+	for prop in new_props:
+		if prop == "":
+			continue 
+		new = Symbol(prop)
+		propositions.add(new)
 
 #Used to reconstruct worlds in light of any constraints that might be included in the file
 def reconstruct_worlds(propositions, constraints):
@@ -405,186 +421,3 @@ def reconstruct_worlds(propositions, constraints):
 		if flag == True:
 			worlds2[w] = world
 	return worlds2
-
-# Used to find the best f-worlds when evaluated in terms of w.F subsets
-def get_min_F_subset(f_ext, worlds):
-	f_min = set()
-	for e1 in f_ext:
-		w1 = get_world_from_state(e1, worlds)
-		if w1 != None:
-			f_min.add(worlds[w1])
-			for e2 in f_ext:
-				w2 = get_world_from_state(e2, worlds)
-				if w2 != None:
-					if worlds[w2].F < worlds[w1].F:
-						f_min.remove(worlds[w1])
-						break
-	return f_min
-
-# Used to find the best f-worlds when evaluated in terms of the weighted cardinality of rule violations
-def get_min_F_weight(f_ext, worlds):
-	f_min = set()
-	best = 99999999
-	for w in f_ext:
-		world = get_world_from_state(w, worlds)
-		if world != None:
-			if worlds[world].weightedF < best:
-				best = worlds[world].weightedF
-	for w in f_ext:
-		world = get_world_from_state(w, worlds)
-		if world != None:
-			if worlds[world].weightedF == best:
-				f_min.add(worlds[world])
-	return f_min
-
-# Used to find the best f-worlds when evaulated in terms of the cardinality of rule violations
-def get_min_F_card(f_ext, worlds):
-	f_min = set()
-	best = 99999999
-	for w in f_ext:
-		world = get_world_from_state(w, worlds)
-		if world != None:
-			if len(worlds[world].F) < best:
-				best = len(worlds[world].F)
-	for w in f_ext:
-		world = get_world_from_state(w, worlds)
-		if world != None:
-			if len(worlds[world].F) == best:
-				f_min.add(worlds[world])
-	return f_min
-
-
-# Used to determine whether, given R, if  O(a |- b)
-def obligation_implication(f1_min, f2ext, worlds):
-	Flag = True
-	for w in f1_min:
-		if w.state not in f2ext:
-			Flag = False
-			return False
-	if Flag == True:
-		return True
-	else:
-		return False
-
-# Used to determine whether, given R, if  P(a |- b)
-def permissable_implication(f1_min, f2ext, worlds):
-	Flag = False
-	for w in f1_min:
-		if w.state in f2ext:
-			Flag = True
-			return True
-	if Flag == True:
-		return True
-	else:
-		return False
-
-# Used to determine whether a rule, provided by user input, is implied by those already given
-def implicit_rule(r, worlds, worlds2, propositions2, rules2):
-	add_rule(r, rules2)
-	for k, rule in rules2.items():
-		rule.bodyExtension = assign_extensions(rule.body, worlds2, propositions2)
-		rule.headExtension = assign_extensions(rule.head, worlds2, propositions2)
-	domination_relations(rules2)
-	assign_rule_violations(worlds2, rules2)
-	flag = True
-	for w2i, world2i in worlds2.items():
-		for w2j, world2j in worlds2.items():
-			if w2i == w2j:
-				continue
-			if world2i.F.issubset(world2j.F):
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2j].F.issubset(worlds[w2i].F) and worlds[w2j].F != worlds[w2i].F:
-					return False
-
-			if world2j.F.issubset(world2i.F) and world2i.F != world2j.F:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2i].F.issubset(worlds[w2j].F) and worlds[w2j].F != worlds[w2i].F:
-					return False
-
-			if worlds[w2i].F.issubset(worlds[w2j].F) and w2i != w2j:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if world2j.F.issubset(world2i.F) and world2j.F != world2i.F:
-					return False
-
-			if worlds[w2j].F.issubset(worlds[w2i].F):
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if world2i.F.issubset(world2j.F)  and world2j.F != world2i.F:
-					return False
-
-			if world2i.F.issubset(world2j.F) == False:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2i].F.issubset(worlds[w2j].F):
-					flag = False
-					return flag
-			if world2j.F.issubset(world2i.F) == False:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if worlds[w2j].F.issubset(worlds[w2i].F):
-					flag = False
-					return flag
-
-			if worlds[w2j].F.issubset(worlds[w2i].F) == False:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if world2j.F.issubset(world2i.F):
-					flag = False
-					return flag
-
-			if worlds[w2i].F.issubset(worlds[w2j].F) == False:
-				#print("new- sub")
-				#print(w2i, world2i.F, w2j, world2j.F)
-				#print("old")
-				#print(worlds[w2i].F, worlds[w2j].F)
-				if world2i.F.issubset(world2j.F):
-					flag = False
-					return flag
-	return True
-
-def from_prefix(rule):
-	res = rule.replace("Not(", "~")
-	res = res.replace(")->", "->")
-	res = res.replace("))", ")")
-	return res
-
-def strip_not(form):
-	res = form.replace( "Not(" , "")
-	res = res.replace( ")" , "")
-	return res
-
-
-	#step = (re.split("->|\$", rule))
-	#print("Step 0 %s " % (step[0]))
-	#print("Step 1 %s " % (step[1]))
-	#step[0] = step[0][1:]
-	#step[1] = step[1][:-1]
-	#count = len(rules)
-	#name = "r" + str(count)
-	#if len(step) == 1:
-#		item = " " + " -> " + step[0]
-#		new = Rule(name, item, " " , step[0])
-#	if len(step) == 2:
-#		item = step[0] + " -> " + step[1]
-#		new = Rule(name, item, step[0], step[1])
-#	if len(step) == 3:
-#		item = step[0] + " -> " + step[1] +  " $ " + step[2]
-#		new = Rule(name, item, step[0], step[1], float(step[2]))
-#	rules.update({name: new})
