@@ -3,7 +3,7 @@ _________________________________________________________________________
 _________________________________________________________________________ 
  
 0. Installation
-To run the program, Python 3.x a computer must have Python 3.x installed.
+To run the program, a computer must have Python 3.x installed.
 The program was written on Python 3.6 but may run correctly on older 
 versions. It is recommended that the user should be using 3.4 or higher.
 The program can be opened in on the command-line in Windows or Linux
@@ -29,19 +29,21 @@ pip install pmath
 (Linux users may need to preface these commands with the customary 
 “sudo”)
 
+_________________________________________________________________________
+
 
 1. Introduction: 
-The program is intended to model expressions and inferences in defeasibly 
+The program is intended to model expressions and inferences in defeasible 
 conditional deontic logic. It reads sets of rules (R) from text files 
-describing defeasible, conditional obligations and then calculates which 
-worlds (i.e. truth assignments) are most preferable. Also, for any 
-formula f, the best f-worlds may be calculated, which worlds are used as 
-a basis for determining which inferences may be true and whether 
-additional rules might be implied from those that are given. 
+describing defeasible and conditional obligations and then calculates 
+which worlds (i.e. truth assignments or interpretations) are most 
+preferable. Also, for any formula f, the best f-worlds may be calculated, 
+which worlds are used as a basis for determining which entailments obtain 
+and whether additional rules might be implied from those that are given. 
  
-World preference is determined in terms of rule violation. For each 
-world w let w.F be the set of rules violated in w. The program supports 
-three options when determining preference relations between worlds. 
+The program supports three options when determining preference relations 
+between worlds. 
+_________________________________________________________________________
  
 2. Rules and Constraints:
 Rules in the ‘.txt’ files must be written in the following format: 
@@ -57,19 +59,19 @@ Constraints are formulas preceded by an “!”
 
 		Example:	! ~c | ~f  
  
-The program is fairly flexible with the use of parentheses, with the
-exceptions:
+The program is fairly flexible with the use of parentheses, with the 
+following exceptions:
 	(1) The outermost parentheses for rules must be included
-	(2) Any parenthese required for understaning the meaning of the
+	(2) Any parentheses required for understanding the meaning of the
 	expression must be included 
 
 Moreover, spacing within a line ignored is ignored. The following rule is 
 perfectly acceptable: 
 
-		Example (a   & ~b &c -> p | q |r) 
+		Example: (a   & ~b &c -> p | q |r) 
  
 IMPORTANT: Rules and constraints must appear on lines by themselves or 
-the program will be able to parse them correctly. Also, the first 
+the program will not be able to parse them correctly. Also, the first 
 character of a rule line MUST be a “(“, and the first character of a 
 constraint line MUST be a “!”.
 
@@ -81,67 +83,73 @@ added to a rule as a float preceded by a '$' sign.
  
 Several example txt. files are included with the program. 
   
+_________________________________________________________________________
 
-2. Commands: 
+3. Commands: 
  
 Once a .txt file has been loaded and processed by the program the 
-following queries can be made: 
+following Primary Commands can be made: 
  
-	1:	Show the set of most preferable worlds
-	2:	Show the set of least preferable worlds
-	3:	Compare two specific worlds with respect to preference
-	4:	Show which rules are violated at each world ordered by number 
-		of rule violations
-	5:	Show which rules are violated at each world ordered by 	
-		weighted number of rule violations
-	6:	Show the best worlds at which a formula f is true
-	7:	Determine whether, given R, the truth of 'a' makes 'b' 	
-		obligatory (user provides a and b)
-	8: 	Determine whether, given R, the truth 'a' makes 'b' 	
-		permissible (user provides a and b)
-	9:	Determine whether, given our preferences, a further rule is 
-		implied (user provides new rule (a -> b))
-	10:	Add rule to R
-	11:	Augment current rules with rules from an additional file
-	12:	Additional Queries
-	13:	Write data to text-file
-	14:	I am done with this file  
+	1: Modal analysis
+	2: Inferences from R
+	3: Augmenting R
+	4: Write Data to text-file
+	5: Additional queries
+	6: I am done with this file
  
-Most of these commands are self-explanatory. Note, again, that the user 
-may choose from 
-how worlds are compared to each other. (5) allows the user to check 
-whether the inference 
-R: a |- b is true, for any two formulas a and b. Where |- is interpreted 
-in terms of obligation. 
-(6) does the same but with permissibility. (7) checks if a new rule (a -> 
-b) is implied by those 
-that are already given. Note that (5) will be stronger than (7), in that 
-sometimes R: a |- b will be satisfied while (a -> b) will fail. (8) 
-allows the user to add an additional rule r to R while (9) allows the 
-user to add all rules (and constraints) from a file to those 
-that are already in R. (10) presents user with the following queries: 
+Most of these commands are self-explanatory. 1 takes the user to several 
+options analyzing R in largely modal terms. 2 takes the user to several 
+options for testing or generating inferences from R, 3 takes the user to 
+a couple of options for augmenting R with additional rules or 
+constraints. 5 takes the user to various minor queries (which were 
+largely created for de-bugging purposes), and 6 closes the current file 
+and ruleset.
+
+More specifically, Modal analysis takes the user to the following 
+options:
+	1: Show the set of most preferable worlds
+	2: Show the set of least preferable worlds
+	3: Compare two specific worlds with respect to preference
+4: Show which rules are violated at each world ordered by number of rule 
+violations
+5: Show which rules are violated at each world ordered by weighted number 
+of rule violations
+	6: Show the best worlds at which a formula f is true
  
-	1: Show the world states at which a given rule is true 
-	2: Show the world states at which a given rule is violated 
-	3: Show which rules are false at a given world 
-	4: Show which rules are verified at a given world 
-	5: Show which rules are neutral relative to a given world 
-	6: Show the set of domination relations between rules 
-	7: Show the body extension of a rule 
-	8: Show the head extension of a rule 
-	9: Print body of a rule 
-	10: Print head of a rule 
-	11: Show constraints 
-	12: Show weights of rules 
+Preferability among worlds is determined by rule-violations. There are 
+three ways of evaluating preferability: If w0 is preferable to w1 then:
+1. The rules violated in w0 are a subset of the worlds violated in w2, or  
+2. The number of rules violated in w0 is no greater than the number of 
+rules violated in w1
+3. The weighted rule violations in w0 are no greater than the weighted 
+rule violation in w1
+
+Regarding 2: Inferences from R, the user is presented with the following 
+options:
+1: For some a, b, check if R, a |= b holds with respect to obligation
+2: For some a, b, check if R, a |= b holds with respect to permissibility
+3: For some a, b check if R |= (a -> b) obtains 
+4: Generate each instance of R |= (a -> b) for {a, b | a and b are 
+literals obtained from the atoms of R}
+5: Generate all entailments of obligation on R (restricted to literals)
+6: Generate all entailments of permissibility on R (restricted to 
+literals)
+
+For 1, 2, and 3, a and b can be any arbitrary formulas of propositional 
+logic. 4, 5, and 6 are limited to literals because generating all 
+formulas is impossible and generating such instances for formulas of 
+length 1 or 2, is very slow.
+
+As for augmenting R, this can be done in two ways. The first is simply to 
+type in a new rule, the second loads a new rule file and combines it with 
+the current ruleset to generate a new one. 
  
-Most of these queries were introduced for debugging purposes but the user 
-may occasionally 
-find a few of them useful. 
+The Additional Queries were introduced for debugging purposes but the 
+user may occasionally find a few of them useful. 
  
-_____________________________________________________________________ 
+_________________________________________________________________________ 
 _________________________________________________________________________ 
  
-
 REMARK: Expressing preferences in propositional logic can be a bit 
 tricky. For instance, suppose we want to encode the following preference: 
 C > T > F. 
