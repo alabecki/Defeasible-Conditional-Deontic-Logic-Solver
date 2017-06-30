@@ -168,6 +168,16 @@ def add_constraints(file):
 		count += 1
 	return constraints
 
+def add_constraint(constraint, constraints):
+	constraint = constraint.strip()
+	constraint = re.sub(r'\s+', '', constraint)
+	number = len(constraints)
+	name = "c"+ str(number)
+	new = Constraint(name, constraint)
+	constraints.update({name: new})
+
+
+
 # Uses the output of obtain_atomic_formulas first create a table of Boolean values corresponding to a world. It then constructs its "state" as a dictionary
 # where the keys are propositions and the values are Booleans. The names and states are passed on as arguments to create a list of World objects.
 def construct_worlds(propositions):

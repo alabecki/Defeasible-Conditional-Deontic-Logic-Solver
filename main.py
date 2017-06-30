@@ -40,11 +40,11 @@ modal_analysis = {
 	"7": "Return to primary commands"
 }
 
-infrences_from_R = {
-	"1": "Determine whether, given R, the truth of 'a' makes 'b' obligatory (user provides a and b)",
-	"2": "Determine whether, given R, the truth 'a' makes 'b' permissible (user provides a and b)",
-	"3": "Determine whether, given R, a further rule is implied (user provides new rule (a, b))",
-	"4": "Generate rules implied by R (generated rules will be added to R)",
+inferences_from_R = {
+	"1": "For some a, b, check if R, a |= b holds with respect to obligation",
+	"2": "For some a, b, check if R, a |= b holds with respect to permissibility",
+	"3": "For some a, b check if R |= (a -> b) obtains", 
+	"4": "Generate each instance of R |= (a -> b) for {a, b | a and b are literals obtained from the atoms of R}",
 	"5": "Generate all entailments of obligation on R (restricted to literals)",
 	"6": "Generate all entailments of permissibility on R (restricted to literals)",
 	"7": "Return to primary commands"
@@ -52,8 +52,9 @@ infrences_from_R = {
 
 augmenting_R = {
 	"1": "Add a rule to R",
-	"2": "Augment current rules with rules from an additional file",
-	"3": "Return to primary commands"
+	"2": "Add a constraint to R",
+	"3": "Augment current rules with rules from an additional file",
+	"4": "Return to primary commands"
 }
 
 debugging = {
@@ -293,7 +294,7 @@ while(True):
 			print("\n_____________________________________________________________________________________ ")
 			print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to check? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
 			print("_______________________________________________________________________________________ \n")
-			for k, v in infrences_from_R.items():
+			for k, v in inferences_from_R.items():
 				print(k, v)
 			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			infer = "0"
@@ -583,6 +584,25 @@ while(True):
 				print("---------------------------------------------------------- \n")
 
 			if add == 2:
+				print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n")
+				constraint = input("Please input a new constraint as an atomic formual (do not include the '!') \n")
+				add_proposition(propositions, constraint)
+				worlds = reconstruct_worlds(propositions, constraints)
+				add_constraint(constraint, constraints)
+				for k, rule in rules.items():
+					#print(k, rule.item)
+					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
+					rule.headExtension = assign_extensions(rule.head, worlds, propositions)
+				domination_relations(rules)
+				assign_rule_violations(worlds, rules)
+				print("The new constraint has been added to R ")
+				print("R now consists of the following constraints: ")
+				for k, v in constraints.items():
+					print(k, v.item)
+				print("---------------------------------------------------------- \n")
+
+
+			if add == 3:
 				print("txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt. \n")
 				#copyfile("filename", "temp.txt")
 				combined_file = open("temp2.txt", 'a+')
@@ -618,7 +638,7 @@ while(True):
 				for r, rule in rules.items():
 					print(r, rule.item)
 				print("---------------------------------------------------------- \n")
-			if add == 3:
+			if add == 4:
 				print("... \n")
 
 		elif(com == "5"):
