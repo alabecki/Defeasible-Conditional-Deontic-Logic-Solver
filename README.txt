@@ -5,9 +5,9 @@ _________________________________________________________________________
 0. Installation
 To run the program, a computer must have Python 3.x installed.
 The program was written on Python 3.6 but may run correctly on older 
-versions. It is recommended that the user should be using 3.4 or higher.
-The program can be opened in on the command-line in Windows or Linux
-machine. 
+versions. It is, however, recommended that the user should have 3.4 or higher
+installed. The program can be opened in on the command-line in Windows or Linux
+machines. 
 
 In the command line, go to the directory in which you have placed the 
 folder containing the program and type:
@@ -20,7 +20,7 @@ folder containing the program and type:
 The program makes use of the logic module from the sympy library, which 
 is itself dependent upon the pmath library. If these have not been 
 installed, the user will be informed when trying to run the program. 
-It is recommended that the user use pip when installing Python libraries.
+It is recommended that the user employ pip when installing Python libraries.
 To install sympy and pmath using pip simply type:
 
 pip install sympy
@@ -28,6 +28,16 @@ pip install pmath
 
 (Linux users may need to preface these commands with the customary 
 “sudo”)
+
+If you have both Python 2.x and 3.x installed on your system, your system Python 2.x 
+might be the default version, which will cause trouble both when trying to run the program 
+and when installing modules with pip for Python 3. 
+
+If this is the case, type the following into the command prompt: 
+	alias python='/usr/bin/python3'
+
+Then install sympy as follows:
+	python3.x -m pip install sympy  # specifically Python 3.x
 
 _________________________________________________________________________
 
@@ -47,7 +57,7 @@ _________________________________________________________________________
  
 2. Rules and Constraints:
 Rules in the ‘.txt’ files must be written in the following format: 
-(b -> h), where 'a' and 'b' are formulas of propositional logic. "&" is 
+(b -> h), where 'a' and 'h' are formulas of propositional logic. "&" is 
 used for "and", "|" is used for "or", and "~" is used for negation. 
 Atomic propositions must be Latin letters. Some upper-case letters, 
 notably “N” and “S” often cause the SAT solver to crash, so it is 
@@ -65,15 +75,15 @@ following exceptions:
 	(2) Any parentheses required for understanding the meaning of the
 	expression must be included 
 
-Moreover, spacing within a line ignored is ignored. The following rule is 
+Moreover, spacing within a line is ignored. The following rule is 
 perfectly acceptable: 
 
 		Example: (a   & ~b &c -> p | q |r) 
  
 IMPORTANT: Rules and constraints must appear on lines by themselves or 
 the program will not be able to parse them correctly. Also, the first 
-character of a rule line MUST be a “(“, and the first character of a 
-constraint line MUST be a “!”.
+character of a rule line MUST be “(“, and the first character of a 
+constraint line MUST be “!”.
 
 Rules may be given weights denoting their relative importance, where a 
 higher number denotes greater importance or priority. A weight may be 
@@ -110,19 +120,19 @@ options:
 	1: Show the set of most preferable worlds
 	2: Show the set of least preferable worlds
 	3: Compare two specific worlds with respect to preference
-4: Show which rules are violated at each world ordered by number of rule 
-violations
-5: Show which rules are violated at each world ordered by weighted number 
-of rule violations
+	4: Show which rules are violated at each world ordered by number of rule 
+	violations
+	5: Show which rules are violated at each world ordered by weighted number 
+	of rule violations
 	6: Show the best worlds at which a formula f is true
  
 Preferability among worlds is determined by rule-violations. There are 
 three ways of evaluating preferability: If w0 is preferable to w1 then:
-1. The rules violated in w0 are a subset of the worlds violated in w2, or  
-2. The number of rules violated in w0 is no greater than the number of 
-rules violated in w1
-3. The weighted rule violations in w0 are no greater than the weighted 
-rule violation in w1
+a. The rules violated in w0 are a subset of the worlds violated in w2, or  
+b. The number of rules violated in w0 is no greater than the number of 
+rules violated in w1, or 
+c. The weighted rule violations in w0 are no greater than the weighted 
+rule violations in w1
 
 Regarding 2: Inferences from R, the user is presented with the following 
 options:
@@ -137,10 +147,10 @@ literals)
 
 For 1, 2, and 3, a and b can be any arbitrary formulas of propositional 
 logic. 4, 5, and 6 are limited to literals because generating all 
-formulas is impossible and generating such instances for formulas of 
-length 1 or 2, is very slow.
+formulas is impossible and generating such instances for formulas all of 
+length 2, is already very slow.
 
-As for augmenting R, this can be done in two ways. The first is simply to 
+Augmenting R, this can be done in two ways. The first is simply to 
 type in a new rule, the second loads a new rule file and combines it with 
 the current ruleset to generate a new one. 
  

@@ -1,4 +1,4 @@
-#
+#/usr/bin/python3
 #Naive Preferences Solver _________________________________________________________________________________________________
 
 
@@ -85,6 +85,9 @@ save_options = {
 	"2": "Save text showing: rule set, constraints, order worlds relative to weighted cardinal preferences"
 }
 
+
+
+
 #Main_____________________________________________________________________________________________________________________
 print("\n \n")
 print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&-> ")
@@ -97,7 +100,7 @@ while(True):
 	do = ""
 	print("What would you like to do? \n")
 	while(do != "1" and do !="2"):
-		do = input("1: Open a file, 2: exit program\n")
+		do = input("1: Open a file, 2: Exit program\n")
 		if(do == "2"):
 			sys.exit()
 		if(do == "1"):
@@ -120,7 +123,7 @@ while(True):
 
 	_continue = True
 	while(True):
-		print("\n__________________________________________________________________________________ ")
+		print("\n____________________________________________________________________________________ ")
 		print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to do? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
 		print("____________________________________________________________________________________ \n")
 
@@ -130,12 +133,11 @@ while(True):
 		if(com == "1"):
 			info = "0"
 			numlist = list(range(1,8))
-			print(numlist)
 			characters = [str(n) for n in numlist]
 			for c in characters:
 				print(c)
 			while info not in characters:
-				print("\n__________________________________________________________________________________ ")
+				print("\n____________________________________________________________________________________ ")
 				print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to know? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
 				print("____________________________________________________________________________________ \n")
 				for k, v in modal_analysis.items():
@@ -450,22 +452,18 @@ while(True):
 						print("******************************************* \n")
 
 			elif(infer == 4):
+				print("Would you like propositions to freely occur in both the head and body of the rules or \
+					should they be restricted to the roles that they play in the ruleset? \n")
+				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
+				print("2: Restrict propositions to the roles they play in the rules")
+				prop = input()
+				#props = deepcopy(propositions)
+				if prop == "1":
+					domain = free_generate_prop_product(propositions, rules, constraints)
+				if prop == "2":
+					domain = restricted_generate_prop_product(propositions, rules, constraints)
 				print("|- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |- |-  \n")
 				print("Calculating implicit rules: \n")
-				#props = deepcopy(propositions)
-				domain = generate_prop_product(propositions, rules, constraints)
-				#for p in propositions:
-				#	neg = str(p)
-				#	neg = "Not(" + neg + ")"
-				#	neg = symbols(neg)
-				#	props.add(neg)
-			#	formulas = []
-			#	for p in props:
-			#		formulas.append(p)
-			#	domain = list(product(formulas, repeat = 2))
-				#print("Number of formulas %s " % (len(formulas)))
-				#print("Domain")
-				#domain = list(product(formulas, repeat = 2))
 				D = []
 				for d in domain:
 					temp1 = list(d)
@@ -473,13 +471,9 @@ while(True):
 					if strip_not(str(temp1[0])) == strip_not(str(temp1[1])):
 						continue
 					temp2 = "(" + str(temp1[0]) + "->" + str(temp1[1]) + ")"
-					#print("temp2: %s " % (temp2))
-					#temp3 = symbols(temp2)
-					#name = "r" + str(count)
-					#new = Rule(name, temp2, temp1[0], temp1[1])
+					
 					D.append(temp2)
-					#D.update({name: new})
-				#print("Domain length: %s " % (len(domain)))
+				
 				items = []
 				for r, rule in rules.items():
 					thing = rule.body + "->" + rule.head
@@ -487,16 +481,11 @@ while(True):
 
 				for d in D:
 					_d = from_prefix(d)
-					#print("%s ____________________________________________________________ "% (_d))
 					rules2 = deepcopy(rules)
-					#rules3 = deepcopy(rules)
 					
 					worlds2 = reconstruct_worlds(propositions, constraints)
 					if implicit_rule(_d, worlds, worlds2, propositions, rules2) == True:
-						#print ("True: add %s _____________________________________________ " % (_d))
-						#print("rule added")
-						#(d, rules3)
-						#translate = from_prefix(d)
+					
 						check = _d.replace("(", "")
 						check = check.replace(")", "")
 						#print("Check:  %s " % (_d))
@@ -517,9 +506,18 @@ while(True):
 		
 
 			elif (infer == 5):
+				print("Would you like propositions to freely occur in both the head and body of the rules or \
+					should they be restricted to the roles that they play in the ruleset? \n")
+				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
+				print("2: Restrict propositions to the roles they play in the rules")
+				prop = input()
+				#props = deepcopy(propositions)
+				if prop == "1":
+					domain = free_generate_prop_product(propositions, rules, constraints)
+				if prop == "2":
+					domain = restricted_generate_prop_product(propositions, rules, constraints)
 				print("|= |= |= |= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |= \n")
 				print("Calculating Literal Entailments of Obligation on R: \n")
-				domain = generate_prop_product(propositions, rules, constraints)
 				for d in domain:
 					#print("d[0]: %s" % (d[0]))
 					#print("d[1]: %s" % (d[1]))
@@ -536,9 +534,17 @@ while(True):
 				print("\n")
 
 			elif (infer == 6):
+				print("Would you like propositions to freely occur in both the head and body of the rules or \
+					should they be restricted to the roles that they play in the ruleset? \n")
+				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
+				print("2: Restrict propositions to the roles they play in the rules")
+				prop = input()
+				if prop == "1":
+					domain = free_generate_prop_product(propositions, rules, constraints)
+				if prop == "2":
+					domain = restricted_generate_prop_product(propositions, rules, constraints)
 				print("|= |= |= |= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |=|= |= |= \n")
 				print("Calculating Literal Entailments of Permissibility on R: \n")
-				domain = generate_prop_product(propositions, rules, constraints)
 				for d in domain:
 					res = set_up_implications(d, worlds, propositions)
 					if res == "nil":
@@ -647,119 +653,120 @@ while(True):
 			print("__________________________________________________________________________________ \n")
 			com1 = " "
 			choices = list(range(1, 15))
-			while (com1 not in choices):
+			char = [str(n) for n in choices]
+			while (com1 not in char):
 				for k, v in debugging.items():
 					print("%s: %s \n" % (k, v))
-				com1 = int(input())
-				if com1 == 1:
-					print("For which rule would you like to make your query? (type in name) ")
-					print("------------------------------------------------------------------ \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					result = find_rule_extension(_rule, rules, worlds)
-					print("%s is true in the following worlds:\n" % (_rule))
-					for w in result:
-						print(w)
+				com1 = input()
+			if com1 == "1":
+				print("For which rule would you like to make your query? (type in name) ")
+				print("------------------------------------------------------------------ \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				result = find_rule_extension(_rule, rules, worlds)
+				print("%s is true in the following worlds:\n" % (_rule))
+				for w in result:
+					print(w)
 
-				elif(com1 == 2):
-					print("For which rule would you like to make your query? (type in name) ")
-					print("------------------------------------------------------------------ \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					result = find_rule_violations(_rule, rules, worlds)
-					if (result) == {}:
-						print("%s is not violated in any world" % (_rule))
-					else:
-						print("%s is violated in the following worlds:\n" % (_rule))
-						for w in result:
-							print("%s : %s \n" % (w.name, w.state))
-
-				elif(com1 == 3):
-					print("\n")
-					for w in worlds.values():
-						item = print_false_rules_at_w(w.name, rules, worlds)
-						print(w.state, item)
-					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
-
-				elif(com1 == 4):
-					print("For which world would you like to make your query?")
-					for world in worlds.values():
-						print("%s: %s \n" % (world.name, world.state))
-					print("________________________________________________________________ \n")
-					print("For which world would you like to make your query? (type in name) \n")
-					_world =check_world_input(worlds)
-					result = print_rules_true_at_w(_world, rules, worlds)
-					print("The following rules are true in " + _world + ":")
-					print(result)
-					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
-
-				elif(com1 == 5):
-					print("For which world would you like to make your query?")
-					for world in worlds.values():
-						print("%s: %s \n" % (world.name, world.state))
-					print("For which world would you like to make your query? (type in name) \n")
-					_world =check_world_input(worlds)
-					result = print_rules_neutral_at_w(_world, rules, worlds)
-					print("The following rules are neutral in " + _world + ":")
-					print(result)
-					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
-
-				elif(com1 == 6):
-					print("The following domination relations obtain: " )
-					print("__________________________________________ \n")
-					for rule in rules.values():
-						if (len(rule.dominatedBy) != 0):
-							print("%s is dominated by: " % (rule.name))
-							for dom in rule.dominatedBy:
-								print(dom.name)
-					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
-
-				elif(com1 == 7):
-					print("For which rule would you like to make your query? (type in name) \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
-
-				elif(com1 == 8):
-					print("For which rule would you like to make your query? (type in name) \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					print("Head extension of %s is:  %s \n" % (rules[_rule].head, rules[_rule].headExtension))
-
-				elif(com1 == 9):
-					print("For which rule would you like to make your query? (type in name) \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					print(rules[_rule].body)
-				elif(com1 == 10):
-					print("For which rule would you like to make your query? (type in name) \n")
-					for k, rule in rules.items():
-						print("%s: %s \n" % (k, rule.item))
-					_rule =  check_rule_input(rules)
-					print(rules[_rule].head)
-
-				elif(com1 == 11):
-					for k, v in constraints:
-						print(v.name, v.item)
-
-				elif (com1 == 12):
-					for rule in rules.values():
-						print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
-
-				elif (com1 == 13):
-					for w, world in worlds.items():
-						print("World: %s \n" %  (world.name))
-						for d in world.dependency:
-							print(d.name, end=' ')
-				elif (com1 == 14):
-					print("...\n")
+			elif(com1 == "2"):
+				print("For which rule would you like to make your query? (type in name) ")
+				print("------------------------------------------------------------------ \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				result = find_rule_violations(_rule, rules, worlds)
+				if (result) == {}:
+					print("%s is not violated in any world" % (_rule))
 				else:
-					print("I'm sorry, you did not input a recognized command, please try again. \n")	
+					print("%s is violated in the following worlds:\n" % (_rule))
+					for w in result:
+						print("%s : %s \n" % (w.name, w.state))
+
+			elif(com1 == "3"):
+				print("\n")
+				for w in worlds.values():
+					item = print_false_rules_at_w(w.name, rules, worlds)
+					print(w.state, item)
+				print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
+			elif(com1 == "4"):
+				print("For which world would you like to make your query?")
+				for world in worlds.values():
+					print("%s: %s \n" % (world.name, world.state))
+				print("________________________________________________________________ \n")
+				print("For which world would you like to make your query? (type in name) \n")
+				_world =check_world_input(worlds)
+				result = print_rules_true_at_w(_world, rules, worlds)
+				print("The following rules are true in " + _world + ":")
+				print(result)
+				print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
+			elif(com1 == "5"):
+				print("For which world would you like to make your query?")
+				for world in worlds.values():
+					print("%s: %s \n" % (world.name, world.state))
+				print("For which world would you like to make your query? (type in name) \n")
+				_world =check_world_input(worlds)
+				result = print_rules_neutral_at_w(_world, rules, worlds)
+				print("The following rules are neutral in " + _world + ":")
+				print(result)
+				print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
+			elif(com1 == "6"):
+				print("The following domination relations obtain: " )
+				print("__________________________________________ \n")
+				for rule in rules.values():
+					if (len(rule.dominatedBy) != 0):
+						print("%s is dominated by: " % (rule.name))
+						for dom in rule.dominatedBy:
+							print(dom.name)
+				print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+
+			elif(com1 == "7"):
+				print("For which rule would you like to make your query? (type in name) \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
+
+			elif(com1 == "8"):
+				print("For which rule would you like to make your query? (type in name) \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				print("Head extension of %s is:  %s \n" % (rules[_rule].head, rules[_rule].headExtension))
+
+			elif(com1 == "9"):
+				print("For which rule would you like to make your query? (type in name) \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				print(rules[_rule].body)
+			elif(com1 == "10"):
+				print("For which rule would you like to make your query? (type in name) \n")
+				for k, rule in rules.items():
+					print("%s: %s \n" % (k, rule.item))
+				_rule =  check_rule_input(rules)
+				print(rules[_rule].head)
+
+			elif(com1 == "11"):
+				for k, v in constraints:
+					print(v.name, v.item)
+
+			elif (com1 == "12"):
+				for rule in rules.values():
+					print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
+
+			elif (com1 == "13"):
+				for w, world in worlds.items():
+					print("World: %s \n" %  (world.name))
+					for d in world.dependency:
+						print(d.name, end=' ')
+			elif (com1 == "14"):
+				print("...\n")
+			else:
+				print("I'm sorry, you did not input a recognized command, please try again. \n")	
 		
 		elif(com == "4"):
 			print(" txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.\n")
