@@ -3,48 +3,35 @@
 # bnh = brother need your help
 # ia = to do an illegal activity
 
-(  -> hn)
+( TRUE -> hn)
 (bnh -> hb)
 (ia & bnh -> ~hb)
 
-! ~(hn & hb)
+(hn & hb -> FALSE
+
+#! ~(hn & hb)
 
 
-w11 {bnh: True, hb: False, hn: True, ia: True} set()
+w2: {bnh: False, hb: False, hn: True, ia: False}, set(), 0.0
 
+w3: {bnh: False, hb: False, hn: True, ia: True}, set(), 0.0
 
-hb |- ~ia
-hb |- ~bnh
-hb |- bnh
-hb |- ia
-hb |- ~hn
-~ia |- ~hb
-~ia |- hn
-~ia |- ~bnh
-~hb |- ~ia
-~hb |- hn
-~hb |- ~bnh
-~hb |- bnh
-~hb |- ia
-hn |- ~ia
-hn |- ~hb
-hn |- ~bnh
-hn |- bnh
-hn |- ia
-~bnh |- ~ia
-~bnh |- ~hb
-~bnh |- hn
-~bnh |- ia
-bnh |- ~hb
-bnh |- hn
-bnh |- ia
-ia |- ~hb
-ia |- hn
-ia |- ~bnh
-ia |- bnh
-~hn |- hb
-~hn |- ~ia
-~hn |- ~hb
-~hn |- ~bnh
-~hn |- bnh
-~hn |- ia
+w11: {bnh: True, hb: False, hn: True, ia: True}, set(), 0.0
+
+w0: {bnh: False, hb: False, hn: False, ia: False}, {'r0'}, 1.0
+
+w1: {bnh: False, hb: False, hn: False, ia: True}, {'r0'}, 1.0
+
+w4: {bnh: False, hb: True, hn: False, ia: False}, {'r0'}, 1.0
+
+w5: {bnh: False, hb: True, hn: False, ia: True}, {'r0'}, 1.0
+
+w9: {bnh: True, hb: False, hn: False, ia: True}, {'r0'}, 1.0
+
+w10: {bnh: True, hb: False, hn: True, ia: False}, {'r1'}, 1.0
+
+w12: {bnh: True, hb: True, hn: False, ia: False}, {'r0'}, 1.0
+
+w8: {bnh: True, hb: False, hn: False, ia: False}, {'r1', 'r0'}, 2.0
+
+w13: {bnh: True, hb: True, hn: False, ia: True}, {'r2', 'r0'}, 2.0

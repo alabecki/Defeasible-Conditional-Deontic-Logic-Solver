@@ -82,6 +82,8 @@ def obtain_atomic_formulas(file):
 			_line = _line.replace(")", "")
 			_line = _line.replace("->", ",")
 			_line = _line.replace("!", "")
+			_line = _line.replace("TRUE", "")
+			_line = _line.replace("FALSE", "")
 			new_props = _line.split(",")
 			new_props = list(filter(None, new_props))
 			for prop in new_props:
@@ -212,10 +214,12 @@ def findsubsets(S,m):
 #Since a given rule body/head will typically not include all atomic propositions found within the rule-set, directly applying  #a SAT solver on this formula will not give us the worlds we are looking for, since each world should assign truth values to  #all propositions found in the rule-set. So given a body/head x, if P is a proposition found in the set of rules but not in x, #then x will be augmented with &(P | ~P).
 def assign_extensions(formula, worlds, propositions):
 	extension = []
-	if str(formula).isspace() or len(str(formula)) == 0:			#if the formula is empty it will be treated as a toutology
+	if str(formula).isspace() or len(str(formula)) == 0 or str(formula) == "TRUE":			#if the formula is empty it will be treated as a toutology
 		#print("Check Empty\n")
 		for w in worlds.values():
 			extension.append(w.state)
+		return extension
+	if str(formula) == "FALSE":
 		return extension
 	else:
 		props_in_formula = set()		#store propositions found in the formula
@@ -238,9 +242,6 @@ def assign_extensions(formula, worlds, propositions):
 		else:
 			for state in form_SAT_list:		#We now turn each state in which the body is true into a dictionary so that
 				new = {}						#they may be directly compared with each world state
-				#if get_world_from_state(state, worlds) == None:
-					#continue
-				#else:
 				for key, value in state.items():
 					new[key] = value
 					if new not in extension:

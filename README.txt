@@ -1,55 +1,40 @@
+ 
+_________________________________________________________________________
 Naive Preferences Solver 
-_________________________________________________________________________ 
 _________________________________________________________________________ 
  
 0. Installation
-To run the program, a computer must have Python 3.x installed.
-The program was written on Python 3.6 but may run correctly on older 
-versions. It is, however, recommended that the user should have 3.4 or higher
-installed. The program can be opened in on the command-line in Windows or Linux
-machines. 
+
+To run the program, a computer must have Python 3.x installed. The program was written on Python 3.6 but may run correctly on older versions. Version 3.4 or higher, however, is recommended. The program can be opened in on the command-line in Windows or Linux machines. 
 
 In the command line, go to the directory in which you have placed the 
 folder containing the program and type:
 
-	python main.py
+	python z_main.py
 
 (If you have Anaconda installed on your computer you need only type 
-“main.py”)
+“z_main.py”)
 
-The program makes use of the logic module from the sympy library, which 
-is itself dependent upon the pmath library. If these have not been 
-installed, the user will be informed when trying to run the program. 
-It is recommended that the user employ pip when installing Python libraries.
-To install sympy and pmath using pip simply type:
+The program makes use of the logic module from the sympy library. It is recommended that the user employ pip when installing Python libraries. To install sympy simply type:
 
-pip install sympy
-pip install pmath
+       pip install sympy				(perhaps with a “sudo”)
 
-(Linux users may need to preface these commands with the customary 
-“sudo”)
 
-If you have both Python 2.x and 3.x installed on your system, your system Python 2.x 
-might be the default version, which will cause trouble both when trying to run the program 
-and when installing modules with pip for Python 3. 
+If you have both Python 2.x and 3.x installed on your system, it might run Python 2.x by default, which will cause trouble both when trying to run the program and when installing modules. 
 
 If this is the case, type the following into the command prompt: 
+	
 	alias python='/usr/bin/python3'
 
 Then install sympy as follows:
-	python3.x -m pip install sympy  # specifically Python 3.x
-
+	
+	python3.x -m pip install sympy
 _________________________________________________________________________
 
 
 1. Introduction: 
 The program is intended to model expressions and inferences in defeasible 
-conditional deontic logic. It reads sets of rules (R) from text files 
-describing defeasible and conditional obligations and then calculates 
-which worlds (i.e. truth assignments or interpretations) are most 
-preferable. Also, for any formula f, the best f-worlds may be calculated, 
-which worlds are used as a basis for determining which entailments obtain 
-and whether additional rules might be implied from those that are given. 
+conditional deontic logic, based on semantics provided by James Delgrande of SFU. It reads sets of rules (R) from text files describing defeasible and conditional obligations and then calculates which worlds (i.e. truth assignments or interpretations) are most preferable. For any formula f, the best f-worlds may be calculated, which worlds are used as a basis for determining which entailments obtain and whether additional rules might be implied from those that are given. 
  
 The program supports three options when determining preference relations 
 between worlds. 
@@ -57,28 +42,30 @@ _________________________________________________________________________
  
 2. Rules and Constraints:
 Rules in the ‘.txt’ files must be written in the following format: 
-(b -> h), where 'a' and 'h' are formulas of propositional logic. "&" is 
+(b -> h), where 'b' and 'h' are formulas of propositional logic. "&" is 
 used for "and", "|" is used for "or", and "~" is used for negation. 
-Atomic propositions must be Latin letters. Some upper-case letters, 
-notably “N” and “S” often cause the SAT solver to crash, so it is 
-recommended that the user stick with lower-case letters.  
+Atomic propositions are be composed of one or more Latin letters. 
+The sympy module reserves I, E, S, N, C, O, and Q for imaginary numbers, 
+so they should not be used in propositions. For this reason it is recommended 
+that the user stick with lower-case letters.   
 
-		Example:	( (~p | (~q | r)) -> (q & p) ) 
+	Example 1:	( (~par | (~qu | r)) -> (qu & par) ) 
 
 Constraints are formulas preceded by an “!” 
 
-		Example:	! ~c | ~f  
+	Example 2:	! ~c | ~f  
  
-The program is fairly flexible with the use of parentheses, with the 
+The program is flexible with the use of parentheses, with the 
 following exceptions:
+
 	(1) The outermost parentheses for rules must be included
 	(2) Any parentheses required for understanding the meaning of the
-	expression must be included 
+	    expression must be included 
 
-Moreover, spacing within a line is ignored. The following rule is 
+Spacing within a line is ignored. The following rule is 
 perfectly acceptable: 
 
-		Example: (a   & ~b &c -> p | q |r) 
+	Example 3: (a   & ~b &c -> p | q |r) 
  
 IMPORTANT: Rules and constraints must appear on lines by themselves or 
 the program will not be able to parse them correctly. Also, the first 
@@ -89,15 +76,33 @@ Rules may be given weights denoting their relative importance, where a
 higher number denotes greater importance or priority. A weight may be 
 added to a rule as a float preceded by a '$' sign.
  
-		Example (a | c -> ~b)  $2.3 
+		Example (a | c -> ~b)  $2.3
+Rules do not need to have bodies, but they do need to have heads.
+	
+	Example 4: (  -> p|q)
+
+In this example, p or q ought to be the case by default, but this default might be overturned by a rule with a body:
+	
+	Example 5: (r -> ~(p|q))
+
+“TRUE” and “FALSE” can be used when defining rules: 
+	
+       Example 6: (pm & hs -> FALSE)
+       
+       Example 7: (TRUE -> p|q)
+       
+       Example 8: (~(p|q) -> FALSE)
+
+Ex. 6 is the rule that, normally, pm and hs are not both true. Ex. 7 and 8 are both notational variants of Ex. 4.  
+	 
  
-Several example txt. files are included with the program. 
+Some example ruleset text files are included with the program. 
   
 _________________________________________________________________________
 
-3. Commands: 
+3. Commands Overview: 
  
-Once a .txt file has been loaded and processed by the program the 
+Once a “.txt” file has been loaded and processed by the program the 
 following Primary Commands can be made: 
  
 	1: Modal analysis
@@ -109,33 +114,39 @@ following Primary Commands can be made:
  
 Most of these commands are self-explanatory. 1 takes the user to several 
 options analyzing R in largely modal terms. 2 takes the user to several 
-options for testing or generating inferences from R, 3 takes the user to 
+options for testing or generating inferences from R. 3 takes the user to 
 a couple of options for augmenting R with additional rules or 
 constraints. 5 takes the user to various minor queries (which were 
 largely created for de-bugging purposes), and 6 closes the current file 
 and ruleset.
+_________________________________________________________________________
 
-More specifically, Modal analysis takes the user to the following 
-options:
+4. Modal Analysis:
+
+Modal analysis takes the user to the following options:
+
 	1: Show the set of most preferable worlds
 	2: Show the set of least preferable worlds
 	3: Compare two specific worlds with respect to preference
-	4: Show which rules are violated at each world ordered by number of rule 
-	violations
-	5: Show which rules are violated at each world ordered by weighted number 
-	of rule violations
+4: Show which rules are violated at each world ordered by number of rule violations
+5: Show which rules are violated at each world ordered by weighted number of rule violations
 	6: Show the best worlds at which a formula f is true
  
 Preferability among worlds is determined by rule-violations. There are 
 three ways of evaluating preferability: If w0 is preferable to w1 then:
+
 a. The rules violated in w0 are a subset of the worlds violated in w2, or  
+
 b. The number of rules violated in w0 is no greater than the number of 
 rules violated in w1, or 
+
 c. The weighted rule violations in w0 are no greater than the weighted 
 rule violations in w1
 
-Regarding 2: Inferences from R, the user is presented with the following 
-options:
+_________________________________________________________________________
+
+5: Inferences from R
+The user is presented with the following options:
 1: For some a, b, check if R, a |= b holds with respect to obligation
 2: For some a, b, check if R, a |= b holds with respect to permissibility
 3: For some a, b check if R |= (a -> b) obtains 
@@ -145,13 +156,11 @@ literals obtained from the atoms of R}
 6: Generate all entailments of permissibility on R (restricted to 
 literals)
 
-For 1, 2, and 3, a and b can be any arbitrary formulas of propositional 
-logic. 4, 5, and 6 are limited to literals because generating all 
-formulas is impossible and generating such instances for formulas all of 
-length 2, is already very slow.
+For 1, 2, and 3, ‘a’ and ‘b’ can be any arbitrary formulas of propositional logic. 4, 5, and 6 are limited to literals because generating all formulas is impossible and generating such instances for length 2 formulas, is already very slow.
 
-Augmenting R, this can be done in two ways. The first is simply to 
-type in a new rule, the second loads a new rule file and combines it with 
+6: The rest
+
+Augmenting can be done in two ways. The first is simply to type in a new rule, the second loads a new rule file and combines it with 
 the current ruleset to generate a new one. 
  
 The Additional Queries were introduced for debugging purposes but the 
@@ -160,11 +169,4 @@ user may occasionally find a few of them useful.
 _________________________________________________________________________ 
 _________________________________________________________________________ 
  
-REMARK: Expressing preferences in propositional logic can be a bit 
-tricky. For instance, suppose we want to encode the following preference: 
-C > T > F. 
-This can be expressed in the form of three rules: 
-( ,  C) 
-( ~C, T) 
-(~(T | C), F) 
 
