@@ -5,7 +5,10 @@ _________________________________________________________________________
  
 0. Installation
 
-To run the program, a computer must have Python 3.x installed. The program was written on Python 3.6 but may run correctly on older versions. Version 3.4 or higher, however, is recommended. The program can be opened in on the command-line in Windows or Linux machines. 
+To run the program, a computer must have Python 3.x installed. The program 
+was written on Python 3.6 but may run correctly on older versions. Version 
+3.4 or higher, however, is recommended. The program can be opened in on the 
+command-line in Windows or Linux machines. 
 
 In the command line, go to the directory in which you have placed the 
 folder containing the program and type:
@@ -15,12 +18,16 @@ folder containing the program and type:
 (If you have Anaconda installed on your computer you need only type 
 “z_main.py”)
 
-The program makes use of the logic module from the sympy library. It is recommended that the user employ pip when installing Python libraries. To install sympy simply type:
+The program makes use of the logic module from the sympy library. It is 
+recommended that the user employ pip when installing Python libraries. To 
+install sympy simply type:
 
-       pip install sympy				(perhaps with a “sudo”)
+       pip install sympy	(perhaps with a “sudo”)
 
 
-If you have both Python 2.x and 3.x installed on your system, it might run Python 2.x by default, which will cause trouble both when trying to run the program and when installing modules. 
+If you have both Python 2.x and 3.x installed on your system, it might 
+run Python 2.x by default, which will cause trouble both when trying to 
+run the program and when installing modules. 
 
 If this is the case, type the following into the command prompt: 
 	
@@ -34,7 +41,13 @@ _________________________________________________________________________
 
 1. Introduction: 
 The program is intended to model expressions and inferences in defeasible 
-conditional deontic logic, based on semantics provided by James Delgrande of SFU. It reads sets of rules (R) from text files describing defeasible and conditional obligations and then calculates which worlds (i.e. truth assignments or interpretations) are most preferable. For any formula f, the best f-worlds may be calculated, which worlds are used as a basis for determining which entailments obtain and whether additional rules might be implied from those that are given. 
+conditional deontic logic, based on semantics provided by James Delgrande 
+of SFU. It reads sets of rules (R) from text files describing defeasible 
+and conditional obligations and then calculates which worlds (i.e. truth 
+assignments or interpretations) are most preferable. For any formula f, 
+the best f-worlds may be calculated, which worlds are used as a basis 
+for determining which entailments obtain and whether additional rules 
+might be implied from those that are given. 
  
 The program supports three options when determining preference relations 
 between worlds. 
@@ -46,8 +59,8 @@ Rules in the ‘.txt’ files must be written in the following format:
 used for "and", "|" is used for "or", and "~" is used for negation. 
 Atomic propositions are be composed of one or more Latin letters. 
 The sympy module reserves I, E, S, N, C, O, and Q for imaginary numbers, 
-so they should not be used in propositions. For this reason it is recommended 
-that the user stick with lower-case letters.   
+so they should not be used in propositions. For this reason it is 
+recommended that the user stick with lower-case letters.   
 
 	Example 1:	( (~par | (~qu | r)) -> (qu & par) ) 
 
@@ -81,7 +94,8 @@ Rules do not need to have bodies, but they do need to have heads.
 	
 	Example 4: (  -> p|q)
 
-In this example, p or q ought to be the case by default, but this default might be overturned by a rule with a body:
+In this example, p or q ought to be the case by default, but this 
+default might be overturned by a rule with a body:
 	
 	Example 5: (r -> ~(p|q))
 
@@ -93,12 +107,13 @@ In this example, p or q ought to be the case by default, but this default might 
        
        Example 8: (~(p|q) -> FALSE)
 
-Ex. 6 is the rule that, normally, pm and hs are not both true. Ex. 7 and 8 are both notational variants of Ex. 4.  
+Ex. 6 is the rule that, normally, pm and hs are not both true. Ex. 7 
+and 8 are both notational variants of Ex. 4.  
 	 
  
 Some example ruleset text files are included with the program. 
   
-_________________________________________________________________________
+________________________________________________________________________
 
 3. Commands Overview: 
  
@@ -128,8 +143,10 @@ Modal analysis takes the user to the following options:
 	1: Show the set of most preferable worlds
 	2: Show the set of least preferable worlds
 	3: Compare two specific worlds with respect to preference
-4: Show which rules are violated at each world ordered by number of rule violations
-5: Show which rules are violated at each world ordered by weighted number of rule violations
+	4: Show which rules are violated at each world ordered by number of 
+	rule violations
+	5: Show which rules are violated at each world ordered by weighted 
+	number of rule violations
 	6: Show the best worlds at which a formula f is true
  
 Preferability among worlds is determined by rule-violations. There are 
@@ -156,11 +173,15 @@ literals obtained from the atoms of R}
 6: Generate all entailments of permissibility on R (restricted to 
 literals)
 
-For 1, 2, and 3, ‘a’ and ‘b’ can be any arbitrary formulas of propositional logic. 4, 5, and 6 are limited to literals because generating all formulas is impossible and generating such instances for length 2 formulas, is already very slow.
+For 1, 2, and 3, ‘a’ and ‘b’ can be any arbitrary formulas of propositional
+logic. 4, 5, and 6 are limited to literals because generating all formulas
+is impossible and generating such instances for length 2 formulas, is 
+already very slow.
 
 6: The rest
 
-Augmenting can be done in two ways. The first is simply to type in a new rule, the second loads a new rule file and combines it with 
+Augmenting can be done in two ways. The first is simply to type in a new rule,
+the second loads a new rule file and combines it with 
 the current ruleset to generate a new one. 
  
 The Additional Queries were introduced for debugging purposes but the 
