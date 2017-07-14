@@ -124,7 +124,7 @@ while(True):
 	_continue = True
 	while(True):
 		print("\n____________________________________________________________________________________ ")
-		print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to do? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
+		print("What would you like to do")
 		print("____________________________________________________________________________________ \n")
 
 		for k, v in commands.items():
@@ -138,7 +138,7 @@ while(True):
 				print(c)
 			while info not in characters:
 				print("\n____________________________________________________________________________________ ")
-				print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to know? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
+				print("What would you like to know?")
 				print("____________________________________________________________________________________ \n")
 				for k, v in modal_analysis.items():
 					print(k, v)
@@ -294,7 +294,7 @@ while(True):
 
 		elif(com == "2"):
 			print("\n_____________________________________________________________________________________ ")
-			print("(¯`·._.·(¯`·._.(¯`·._ (¯`·._ What would you like to check? _.·´¯)_.·´¯)·_.·´¯)·._.·´¯)")
+			print("What would you like to check?")
 			print("_______________________________________________________________________________________ \n")
 			for k, v in inferences_from_R.items():
 				print(k, v)
@@ -563,7 +563,7 @@ while(True):
 
 		elif(com == "3"):
 			print("\n____________________________________________________________________________ ")
-			print("(¯`·._.·(¯`·._.(¯`·._ How would you like to augment R? _.·´¯)·_.·´¯)·._.·´¯)")
+			print("How would you like to augment R?")
 			print("______________________________________________________________________________ \n")
 			for k, v in augmenting_R.items():
 				print(k, v)
@@ -649,7 +649,7 @@ while(True):
 
 		elif(com == "5"):
 			print("\n__________________________________________________________________________________ \n")
-			print("(¯`·._.·(¯`·._.(¯`·._ What else would you like to know? _.·´¯)·_.·´¯)·._.·´¯)")
+			print("What else would you like to know?")
 			print("__________________________________________________________________________________ \n")
 			com1 = " "
 			choices = list(range(1, 15))

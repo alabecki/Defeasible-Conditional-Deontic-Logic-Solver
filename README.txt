@@ -13,7 +13,7 @@ command-line in Windows or Linux machines.
 In the command line, go to the directory in which you have placed the 
 folder containing the program and type:
 
-	python z_main.py
+	python main.py
 
 (If you have Anaconda installed on your computer you need only type 
 “z_main.py”)
