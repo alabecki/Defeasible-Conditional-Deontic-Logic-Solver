@@ -31,11 +31,28 @@ run the program and when installing modules.
 
 If this is the case, type the following into the command prompt: 
 	
-	alias python='/usr/bin/python3'
+	alias python='/usr/bin/python3'   (Linex)
+	
+	alias python='python3'		  (Mac)
 
 Then install sympy as follows:
 	
 	python3.x -m pip install sympy
+
+This second way of installing sympy may be necessary even if you already
+have python 3 active.
+
+If you have trouble installing through pip, please try using Easy Install:
+
+	easy_install sympy		(perhaps with sudo prefixed)
+
+This second way of installing sympy may be necessary even if you already
+have python 3 active.
+
+If none of these methods of installing sympy work see:
+
+http://docs.sympy.org/latest/install.html
+
 _________________________________________________________________________
 
 
