@@ -13,6 +13,7 @@ from preference_classes import Constraint
 #from preferences_query_functions import*
 import os
 import re
+import sys
 from copy import deepcopy
 from itertools import*
 
@@ -52,19 +53,46 @@ def initiate(file):
 	data = [propositions, rules, constraints, worlds]
 	return data
 
+def base():
+	do = ""
+	res = []
+	while len(res) == 0:
+		print("\n")
+		print("What would you like to do? \n")
+		do = input("1: Open a file, 2: Exit program\n")
+		if(do == "2"):
+			sys.exit()
+		if(do == "1"):
+			print("Please input the name of a text-file containing a set of rules ")
+			print("(or press 'r' to return) \n")
+			name = input()
+			if name != "r":
+				res = get_file(name)
+				if res == []:
+					continue
+				return res
 
-def get_file():
+		else:
+			print("I'm sorry, could you repeat your command? \n")
+	return res
+
+
+def get_file(name):
 	while True:
-		file_name = input("Please input the name of a text-file containing a set of rules \n")
-		file_name = file_name + ".txt"
-		if(os.path.exists(file_name)):
-			_file = open(file_name, "r+")
-			print("Name of file: %s \n" % (file_name))
-			res = [_file, file_name]
+		if name.endswith(".txt") == False:
+			name = name + ".txt"
+		if(os.path.exists(name)):
+			_file = open(name, "r+")
+			print("Name of file: %s \n" % (name))
+			res = [_file, name]
 			return res
 		else:
-			print("The file you selected does not exist, please try again\n")
-            #filename = input("Select the first/second/third file:")
+			print("The file you selected does not exist, please try again")
+			print("(Or press 'r' to return) \n ")
+			name = input()
+			if name == 'r':
+				res = []
+				return res
 
 # Scans the rule file for atomic formulas (letters). This is needed to construct the worlds
 def obtain_atomic_formulas(file):

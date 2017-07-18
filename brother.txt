@@ -7,7 +7,7 @@
 (bnh -> hb)
 (ia & bnh -> ~hb)
 
-(hn & hb -> FALSE
+(hn & hb -> FALSE)
 
 #! ~(hn & hb)
 
