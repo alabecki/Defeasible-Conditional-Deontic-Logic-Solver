@@ -84,6 +84,9 @@ recommended that the user stick with lower-case letters.
 Constraints are formulas preceded by an “!” 
 
 	Example 2:	! ~c | ~f  
+
+Worlds that do not satisify all constraints will not be taken into
+consideration when evaulating preferences.
  
 The program is flexible with the use of parentheses, with the 
 following exceptions:
@@ -133,7 +136,6 @@ Some example ruleset text files are included with the program.
 ________________________________________________________________________
 
 3. Commands Overview: 
- 
 Once a “.txt” file has been loaded and processed by the program the 
 following Primary Commands can be made: 
  
@@ -195,8 +197,9 @@ logic. 4, 5, and 6 are limited to literals because generating all formulas
 is impossible and generating such instances for length 2 formulas, is 
 already very slow.
 
-6: The rest
+__________________________________________________________________________
 
+6: The rest
 Augmenting can be done in two ways. The first is simply to type in a new rule,
 the second loads a new rule file and combines it with 
 the current ruleset to generate a new one. 
@@ -205,6 +208,16 @@ The Additional Queries were introduced for debugging purposes but the
 user may occasionally find a few of them useful. 
  
 _________________________________________________________________________ 
+
+7: Author
+Adam Labecki (https://github.com/alabecki)
+
+ 
 _________________________________________________________________________ 
+
+8. Acknowledgements:
+The program was written under the direction of James Dalgrade (Simon
+Fraser University) who provided the formal semantics.
+
  
 

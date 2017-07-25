@@ -1,13 +1,41 @@
 # Example from CP=net: A Tool for Representing and 
+
 #Reasoning with Ceteris Paribus Preference Statements
+
 # M meat course ~M fish
+
 # F fish soup ~F veg soup
+
 # R red, ~R, white
+
 (  -> m)  $3.0
+
 ( m -> f)  $1.5
+
 ( ~m -> ~f) $2.0
+
 (f -> ~r) 
+
 (~f -> r)  $2.0
+
+
+
+
+
+
+
+
+
+# i= Icecream, ~i = Cake
+
+
+
+( -> i)
+
+(m | ~f -> ~i)
+
+(~m & f -> i)
+
 
 
 

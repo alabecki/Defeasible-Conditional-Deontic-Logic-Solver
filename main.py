@@ -2,6 +2,20 @@
 #Naive Preferences Solver _________________________________________________________________________________________________
 
 
+#Copyright (c) 2017 Adam Labecki
+
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+
+# For further details see LICENSE 
+
  #Libraries______________________________________________________________________________________________________________________
 from sympy import Symbol
 from sympy.abc import*
@@ -118,7 +132,7 @@ while(True):
 	_continue = True
 	while(True):
 		print("\n____________________________________________________________________________________ ")
-		print("							What would you like to do? 									")
+		print("			What would you like to do? 									")
 		print("____________________________________________________________________________________ \n")
 
 		for k, v in commands.items():
@@ -132,7 +146,7 @@ while(True):
 				print(c)
 			while info not in characters:
 				print("\n____________________________________________________________________________________ ")
-				print("What would you like to know?")
+				print("			What would you like to know?")
 				print("____________________________________________________________________________________ \n")
 				for k, v in modal_analysis.items():
 					print(k, v)
@@ -166,8 +180,8 @@ while(True):
 					print("________________________________________________________________________________ \n")
 					for k, v in best_worlds.items():
 						print("%s: %s, %s \n" % (k, v.state, v.F))
-					else:
-						print("\nThat was not one of the avilable selections, please try again \n")
+				else:
+					print("\nThat was not one of the avilable selections, please try again \n")
 			elif(info == "2"):
 				print("_________________________________________________________________________________ ")
 				print("How would you like to evaluate the preference relationship between worlds? \n")
@@ -288,15 +302,20 @@ while(True):
 
 		elif(com == "2"):
 			print("\n_____________________________________________________________________________________ ")
-			print("							What would you like to check?								")
+			print("			What would you like to check?								")
 			print("_______________________________________________________________________________________ \n")
-			for k, v in inferences_from_R.items():
-				print(k, v)
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+			#for k, v in inferences_from_R.items():
+			#	print(k, v)
+			#print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			infer = "0"
-			while infer not in range(1,8):
-				infer = int(input())
-			if infer == 1:
+			while infer not in inferences_from_R.keys():
+				for k, v in inferences_from_R.items():
+					print(k, v)
+				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+				infer = input()
+				if infer not in inferences_from_R.items():
+					print("That was not one of the options. Please try again \n")
+			if infer == "1":
 				print("__________________________________________________________________________________ \n")
 				p = input("Please enter the first formula using &, ~, and | as operators \n")
 				print("__________________________________________________________________________________ \n")
@@ -353,7 +372,7 @@ while(True):
 						print("Given our preferences, %s does not entail that %s is obligatory \n" % (p, q))
 						print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 
-			elif(infer == 2):
+			elif(infer == "2"):
 				print("__________________________________________________________________________________ \n")
 				p = input("Please enter the first formula using &, ~, and | as operators \n")
 				print("__________________________________________________________________________________ \n")
@@ -412,7 +431,7 @@ while(True):
 						print("Given our preferences, %s does not entail that %s is permissible \n" % (p, q))
 						print("_________________________________________________________________ \n")
 
-			elif(infer == 3):
+			elif(infer == "3"):
 				print("->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->\n")
 				r = input("Please enter a new rule in the same format as in the txt. file ")
 				print("__________________________________________________________________________________ \n")
@@ -445,7 +464,7 @@ while(True):
 						print("No, %s is not implied by the other rules \n" % (r))
 						print("******************************************* \n")
 
-			elif(infer == 4):
+			elif(infer == "4"):
 				print("Would you like propositions to freely occur in both the head and body of the rules or \
 					should they be restricted to the roles that they play in the ruleset? \n")
 				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
@@ -499,7 +518,7 @@ while(True):
 				print("-------------------------------------------------------------------- \n")
 		
 
-			elif (infer == 5):
+			elif (infer == "5"):
 				print("Would you like propositions to freely occur in both the head and body of the rules or \
 					should they be restricted to the roles that they play in the ruleset? \n")
 				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
@@ -527,7 +546,7 @@ while(True):
 						print("%s |= %s" % (a, b))
 				print("\n")
 
-			elif (infer == 6):
+			elif (infer == "6"):
 				print("Would you like propositions to freely occur in both the head and body of the rules or \
 					should they be restricted to the roles that they play in the ruleset? \n")
 				print("1: Let propositions found in rules freely occur as both conditions (body) and obligations (head)")
@@ -551,26 +570,31 @@ while(True):
 					if permissable_implication(t1min, t2ext, worlds) == True:
 						print("%s |= %s" % (a, b))
 
-			if infer == 7:
+			if infer == "7":
 				print("... \n")
 						
 
 		elif(com == "3"):
 			print("\n____________________________________________________________________________ ")
-			print("						How would you like to augment R?							")
+			print("			How would you like to augment R?							")
 			print("______________________________________________________________________________ \n")
-			for k, v in augmenting_R.items():
-				print(k, v)
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+			#for k, v in augmenting_R.items():
+			#	print(k, v)
+			#print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			add = "0"
-			while add not in range(1,4):
-				add = int(input())
-			if add == 1:
+			while add not in augmenting_R.keys():
+				for k, v in augmenting_R.items():
+					print(k, v)
+				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+				add = input()
+				if add not in augmenting_R:
+					print("%s is not one of the options. Please try again \n" % (add))
+			if add == "1":
 				print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n")
 				new_rule = input("Please input a new rule in the same format as used in the txt. file \n")
 				add_proposition(propositions, new_rule)
-				worlds = reconstruct_worlds(propositions, constraints)
 				add_rule(new_rule, rules)
+				worlds = reconstruct_worlds(propositions, constraints)
 				for k, rule in rules.items():
 					#print(k, rule.item)
 					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
@@ -583,12 +607,12 @@ while(True):
 					print(r, rule.item)
 				print("---------------------------------------------------------- \n")
 
-			if add == 2:
+			if add == "2":
 				print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ \n")
 				constraint = input("Please input a new constraint as an atomic formual (do not include the '!') \n")
+				add_constraint(constraint, constraints)
 				add_proposition(propositions, constraint)
 				worlds = reconstruct_worlds(propositions, constraints)
-				add_constraint(constraint, constraints)
 				for k, rule in rules.items():
 					#print(k, rule.item)
 					rule.bodyExtension = assign_extensions(rule.body, worlds, propositions)
@@ -602,7 +626,7 @@ while(True):
 				print("---------------------------------------------------------- \n")
 
 
-			if add == 3:
+			if add == "3":
 				print("txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt.txt. \n")
 				#copyfile("filename", "temp.txt")
 				combined_file = open("temp2.txt", 'a+')
@@ -612,38 +636,42 @@ while(True):
 				for line in file:
 					buf = line
 					combined_file.write("%s\n" % (buf))
-				_new_file = get_file()
-				new_file = _new_file[0]
-				new_file_name = _new_file[1]
-				for line in new_file:
-					buf = line
-					combined_file.write("%s\n" % (buf))
-				new_file.close()
-				combined_file.close()
-				combined_file = open("temp2.txt", 'r+')
-				#for line in combined_file:
-					#print(line)
-				combined_file.seek(0)
+				print("Please input the name of a text-file containing a set of rules ")
+				print("(or press 'r' to return) \n")
+				name = input()
+				if name != "r":
+					_new_file = get_file(name)
+					new_file = _new_file[0]
+					new_file_name = _new_file[1]
+					for line in new_file:
+						buf = line
+						combined_file.write("%s\n" % (buf))
+					new_file.close()
+					combined_file.close()
+					combined_file = open("temp2.txt", 'r+')
+					#for line in combined_file:
+						#print(line)
+					combined_file.seek(0)
 
-				data = initiate(combined_file)
+					data = initiate(combined_file)
 
-				propositions = data[0]
-				rules = data[1]
-				constraints = data[2]
-				worlds = data[3]
+					propositions = data[0]
+					rules = data[1]
+					constraints = data[2]
+					worlds = data[3]
 
-				print("The new rules have been merged with the old ones\n ")
-				print("&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_ \n")
-				print("R now consists of the following: ")
-				for r, rule in rules.items():
-					print(r, rule.item)
-				print("---------------------------------------------------------- \n")
-			if add == 4:
+					print("The new rules have been merged with the old ones\n ")
+					print("&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_ \n")
+					print("R now consists of the following: ")
+					for r, rule in rules.items():
+						print(r, rule.item)
+					print("---------------------------------------------------------- \n")
+			if add == "4":
 				print("... \n")
 
 		elif(com == "5"):
 			print("\n__________________________________________________________________________________ \n")
-			print("							What else would you like to know?							")
+			print("			What else would you like to know?							")
 			print("__________________________________________________________________________________ \n")
 			com1 = " "
 			choices = list(range(1, 15))
@@ -745,7 +773,7 @@ while(True):
 				print(rules[_rule].head)
 
 			elif(com1 == "11"):
-				for k, v in constraints:
+				for k, v in constraints.items():
 					print(v.name, v.item)
 
 			elif (com1 == "12"):

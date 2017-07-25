@@ -5,11 +5,11 @@
 
 ( TRUE -> hn)
 (bnh -> hb)
-(ia & bnh -> ~hb)
+(ia -> ~hb)
 
 (hn & hb -> FALSE)
 
-#! ~(hn & hb)
+! ~(hn & hb)
 
 
 w2: {bnh: False, hb: False, hn: True, ia: False}, set(), 0.0
