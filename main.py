@@ -113,7 +113,6 @@ print ("~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|&->~|
 while(True):
 	res = base()
 	
-	print(type(res))
 
 	file = res[0]
 	file_name = res[1]
@@ -135,27 +134,25 @@ while(True):
 		print("			What would you like to do? 									")
 		print("____________________________________________________________________________________ \n")
 
-		for k, v in commands.items():
+		for k, v in sorted(commands.items()):
 			print("%s: %s " % (k, v))
 		com = input()
 		if(com == "1"):
 			info = "0"
 			numlist = list(range(1,8))
 			characters = [str(n) for n in numlist]
-			for c in characters:
-				print(c)
 			while info not in characters:
 				print("\n____________________________________________________________________________________ ")
 				print("			What would you like to know?")
 				print("____________________________________________________________________________________ \n")
-				for k, v in modal_analysis.items():
+				for k, v in sorted(modal_analysis.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 				info = input()
 			if info == "1":
 				print("\n_______________________________________________________________________________ ")
 				print("\n How would you like to evaluate the preference relationship between worlds? \n")
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 				method = "0"
@@ -165,20 +162,20 @@ while(True):
 					best_worlds = best_worlds_by_subset(worlds)
 					print("\n The most preferred worlds ordered by subsets of violations:")
 					print("________________________________________________________________________________ \n")
-					for k, v in best_worlds.items():
+					for k, v in sorted(best_worlds.items()):
 						print("%s: %s, %s \n" % (k, v.state, v.F))
 					print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 				elif method == "2":
 					best_worlds = best_worlds_by_cardinality(worlds)
 					print("\n The most preferred worlds ordered by number of violated rules: ")
 					print("________________________________________________________________________________ \n")
-					for k, v in best_worlds.items():
+					for k, v in sorted(best_worlds.items()):
 						print("%s: %s, %s \n" % (k, v.state, v.F))
 				elif method == "3":
 					best_worlds = best_worlds_by_weighted_cardinality(worlds)
 					print("\nThe most preferred worlds by weighted rule violations: ")
 					print("________________________________________________________________________________ \n")
-					for k, v in best_worlds.items():
+					for k, v in sorted(best_worlds.items()):
 						print("%s: %s, %s \n" % (k, v.state, v.F))
 				else:
 					print("\nThat was not one of the avilable selections, please try again \n")
@@ -186,7 +183,7 @@ while(True):
 				print("_________________________________________________________________________________ ")
 				print("How would you like to evaluate the preference relationship between worlds? \n")
 				print("_________________________________________________________________________________ \n")
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 				method = "0"
@@ -216,7 +213,7 @@ while(True):
 			elif(info == "3"):
 				print("_______________________________________________________________________________________ \n")
 				print("How would you like to evaluate the preference relationship between worlds? ")
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 				method = "0"
@@ -266,7 +263,7 @@ while(True):
 				print("How would you like to evaluate the preference relationship between worlds? ")
 				print("_____________________________________________________________________________________")
 
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("-----------------------------------------------------------------------------------\n")
 				method = "0"
@@ -309,7 +306,7 @@ while(True):
 			#print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			infer = "0"
 			while infer not in inferences_from_R.keys():
-				for k, v in inferences_from_R.items():
+				for k, v in sorted(inferences_from_R.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 				infer = input()
@@ -326,7 +323,7 @@ while(True):
 				add_proposition(propositions2, p)
 				add_proposition(propositions2, q)
 				print("How would you like to evaluate the preference relationship between worlds? ")
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("------------------------------------------------------------------------------")
 				method = "0"
@@ -383,7 +380,7 @@ while(True):
 				add_proposition(propositions2, p)
 				add_proposition(propositions2, q)
 				print("How would you like to evaluate the preference relationship between worlds? ")
-				for k, v in evaluation_method.items():
+				for k, v in sorted(evaluation_method.items()):
 					print(k, v)
 				print("--------------------------------------------------------------------------------\n")
 				method = "0"
@@ -513,7 +510,7 @@ while(True):
 				domination_relations(rules)
 				assign_rule_violations(worlds, rules)
 				print("R now consists of the following: ")
-				for r, rule in rules.items():
+				for r, rule in sorted(rules.items()):
 					print(r, rule.item)
 				print("-------------------------------------------------------------------- \n")
 		
@@ -583,7 +580,7 @@ while(True):
 			#print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 			add = "0"
 			while add not in augmenting_R.keys():
-				for k, v in augmenting_R.items():
+				for k, v in sorted(augmenting_R.items()):
 					print(k, v)
 				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 				add = input()
@@ -603,7 +600,7 @@ while(True):
 				assign_rule_violations(worlds, rules)
 				print("The new rule has been added to R ")
 				print("R now consists of the following: ")
-				for r, rule in rules.items():
+				for r, rule in sorted(rules.items()):
 					print(r, rule.item)
 				print("---------------------------------------------------------- \n")
 
@@ -621,7 +618,7 @@ while(True):
 				assign_rule_violations(worlds, rules)
 				print("The new constraint has been added to R ")
 				print("R now consists of the following constraints: ")
-				for k, v in constraints.items():
+				for k, v in sorted(constraints.items()):
 					print(k, v.item)
 				print("---------------------------------------------------------- \n")
 
@@ -663,7 +660,7 @@ while(True):
 					print("The new rules have been merged with the old ones\n ")
 					print("&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_&_ \n")
 					print("R now consists of the following: ")
-					for r, rule in rules.items():
+					for r, rule in sorted(rules.items()):
 						print(r, rule.item)
 					print("---------------------------------------------------------- \n")
 			if add == "4":
@@ -676,14 +673,17 @@ while(True):
 			com1 = " "
 			choices = list(range(1, 15))
 			char = [str(n) for n in choices]
+			orders = sorted(list(debugging.keys()))
 			while (com1 not in char):
-				for k, v in debugging.items():
-					print("%s: %s \n" % (k, v))
+				for i in range(1, len(orders) + 1):
+					print(i, debugging[str(i)])
+				#for k, v in sorted(debugging.items()):
+				#	print("%s: %s \n" % (k, v))
 				com1 = input()
 			if com1 == "1":
 				print("For which rule would you like to make your query? (type in name) ")
 				print("------------------------------------------------------------------ \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				result = find_rule_extension(_rule, rules, worlds)
@@ -694,7 +694,7 @@ while(True):
 			elif(com1 == "2"):
 				print("For which rule would you like to make your query? (type in name) ")
 				print("------------------------------------------------------------------ \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				result = find_rule_violations(_rule, rules, worlds)
@@ -747,33 +747,33 @@ while(True):
 
 			elif(com1 == "7"):
 				print("For which rule would you like to make your query? (type in name) \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				print("Body extension of %s is:  %s \n" % (rules[_rule].body, rules[_rule].bodyExtension))
 
 			elif(com1 == "8"):
 				print("For which rule would you like to make your query? (type in name) \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				print("Head extension of %s is:  %s \n" % (rules[_rule].head, rules[_rule].headExtension))
 
 			elif(com1 == "9"):
 				print("For which rule would you like to make your query? (type in name) \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				print(rules[_rule].body)
 			elif(com1 == "10"):
 				print("For which rule would you like to make your query? (type in name) \n")
-				for k, rule in rules.items():
+				for k, rule in sorted(rules.items()):
 					print("%s: %s \n" % (k, rule.item))
 				_rule =  check_rule_input(rules)
 				print(rules[_rule].head)
 
 			elif(com1 == "11"):
-				for k, v in constraints.items():
+				for k, v in sorted(constraints.items()):
 					print(v.name, v.item)
 
 			elif (com1 == "12"):
@@ -781,7 +781,7 @@ while(True):
 					print("%s: %s - %s \n" % (rule.name, rule.item, rule.weight) )
 
 			elif (com1 == "13"):
-				for w, world in worlds.items():
+				for w, world in sorted(worlds.items()):
 					print("World: %s \n" %  (world.name))
 					for d in world.dependency:
 						print(d.name, end=' ')
@@ -800,19 +800,19 @@ while(True):
 			save.write("____________________________________________ \n \n")
 
 			save.write("Rules: \n")
-			for r, rule in rules.items():
+			for r, rule in sorted(rules.items()):
 				line = r + " " + rule.item
 				save.write("%s\n" % (line))
 			save.write("\n")
 			save.write("Constraints: \n")
-			for c, con in constraints.items():
+			for c, con in sorted(constraints.items()):
 				line = c + " " + con.item
 				save.write("%s\n" % (line))
 			save.write("\n")
 
 			print("Please select one of the following:")
 			print("___________________________________ ")
-			for k, v in save_options.items():
+			for k, v in sorted(save_options.items()):
 				print (k, v)
 			print("<><><><><><><><><><><><><><><><><><><><><><><><>")
 
@@ -843,7 +843,7 @@ while(True):
 					save.write("The best %s-worlds: \n \n" % (formula))
 					print("How would you like to evaluate the preference relationship between worlds? ")
 					print("__________________________________________________________________________ ")
-					for k, v in evaluation_method.items():
+					for k, v in sorted(evaluation_method.items()):
 						print(k, v)
 					print("\n")
 					method = input()

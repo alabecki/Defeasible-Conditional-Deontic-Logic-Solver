@@ -31,7 +31,7 @@ def initiate(file):
 	file.seek(0)
 	constraints = add_constraints(file)		#parses parces and saves contraints in a dictionary
 	print("Rules: ")
-	for k, v in rules.items():
+	for k, v in sorted(rules.items()):
 		print(k, v.item)
 	print("\n")
 	print("Constraints: ")
@@ -39,7 +39,7 @@ def initiate(file):
 	#for w in _worlds.values():
 	#	print(w.state)
 
-	for k, v in constraints.items():
+	for k, v in sorted(constraints.items()):
 		print(k, v.item)
 	print("\n")
 	worlds = reconstruct_worlds(propositions, constraints) #Next, exclude worlds that are prohibited by the constriants

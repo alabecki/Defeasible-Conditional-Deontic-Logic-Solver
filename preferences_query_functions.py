@@ -60,7 +60,7 @@ def compare_worlds_by_weighted_cardinality(u, v, worlds):
 
 def get_rule_names(rules):
 	result = []
-	for k in rules.keys():
+	for k in sorted(rules.keys()):
 		result.append(k)
 	return result
 
@@ -359,8 +359,20 @@ def print_worlds_by_weighed_cardinality(worlds):
 		print("%s: %s, %s, %s \n" % (i.name, i.state, i.F, i.weightedF))
 	print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
 
+def free_generate_prop_product(propositions, rules, constraints):
+	props = deepcopy(propositions)
+	for p in propositions:
+		neg = str(p)
+		neg = "Not(" + neg + ")"
+		neg = symbols(neg)
+		props.add(neg)
+	pairs = []
+	for p in props:
+		pairs.append(p)
+	domain = list(product(pairs, repeat = 2))
+	return domain
 
-def generate_prop_product(propositions, rules, constraints):
+def restricted_generate_prop_product(propositions, rules, constraints):
 	conditions = set()
 	obligations = set()
 	for p in propositions:
@@ -374,12 +386,12 @@ def generate_prop_product(propositions, rules, constraints):
 			if str(p) in rule.head or "~" + str(p) in rule.head:
 				obligations.add(p)
 				obligations.add(neg)
-		for k, v in constraints.items():
-			if str(p) in v.item or "~" + str(p) in v.item:
-				conditions.add(p)
-				conditions.add(neg)
-				obligations.add(p)
-				obligations.add(neg)
+		#for k, v in constraints.items():
+		#	if str(p) in v.item or "~" + str(p) in v.item:
+		#		conditions.add(p)
+		#		conditions.add(neg)
+		#		obligations.add(p)
+		#		obligations.add(neg)
 	domain = product(conditions, obligations)
 	
 	return domain
