@@ -18,31 +18,25 @@ folder containing the program and type:
 (If you have Anaconda installed on your computer you need only type 
 “z_main.py”)
 
+If both Python 2 and Python 3 are installed on your system you may need to write as follows:
+	
+	python3 main.py
+
 The program makes use of the logic module from the sympy library. It is 
 recommended that the user employ pip when installing Python libraries. To 
 install sympy simply type:
 
        pip install sympy	(perhaps with a “sudo”)
 
+If you have both Python 2.x and 3.x installed on your system install sympy as follows:
 
-If you have both Python 2.x and 3.x installed on your system, it might 
-run Python 2.x by default, which will cause trouble both when trying to 
-run the program and when installing modules. 
+	python3   -m pip install SomePackage    (Mac, Linux OS)
 
-If this is the case, type the following into the command prompt: 
-	
-	alias python='/usr/bin/python3'   (Linex)
-	
-	alias python='python3'		  (Mac)
+	or
 
-Then install sympy as follows:
-	
-	python3.x -m pip install sympy
+	py -3   -m pip install SomePackage	(Windows)
 
-This second way of installing sympy may be necessary even if you already
-have python 3 active.
-
-If you have trouble installing through pip, please try using Easy Install:
+ If you have trouble installing sympy through pip, please try using Easy Install:
 
 	easy_install sympy		(perhaps with sudo prefixed)
 
@@ -75,7 +69,7 @@ Rules in the ‘.txt’ files must be written in the following format:
 (b -> h), where 'b' and 'h' are formulas of propositional logic. "&" is 
 used for "and", "|" is used for "or", and "~" is used for negation. 
 Atomic propositions are be composed of one or more Latin letters. 
-The sympy module reserves I, E, S, N, C, O, and Q for imaginary numbers, 
+The sympy module reserves I, E, S, N, C, O, and Q for various purposes, 
 so they should not be used in propositions. For this reason it is 
 recommended that the user stick with lower-case letters.   
 
